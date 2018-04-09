@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<meta name="viewport" content="width=750,user-scalable=no"/>
+    	<meta content="telephone=no, address=no" name="format-detection" />
+    	<!-- build:css ../css/common.css -->
+	    <link rel="stylesheet" type="text/css" href="../css/rest.css"/>
+	    <link rel="stylesheet" type="text/css" href="../css/base.css"/>
+	    <!-- /build -->
+		<title>申请服务</title>
+	</head>
+	<body data = "2">
+		<div class="header-wrap">
+			<div class="header_left login_top_back sprite arrow_left_orange">返回</div>
+			<h1 class="index_tit header_tit">申请服务</h1>
+			<div class="header_right login_top_right apply_service_top_right">合作协议</div>
+		</div>
+		<div class="empty"></div>
+		<div class="main-wrap login_main-wrap">
+			<div class="main">
+				<ul class="apply_service_main">
+					<li>
+						<span class="left">店铺名称：</span><input type="text" id="shopName" placeholder="请输入店铺名称" />
+					</li>
+					<li>
+						<span class="left">联系电话：</span><input type="text" id="shopPhone"  placeholder="请输入联系电话" />
+					</li>
+					<li>
+						<span class="left">联系人：</span><input type="text" id="shopPeople"  placeholder="请输入联系人" />
+					</li>
+					<li>
+						<span class="left">选择省市：</span><input type="text" id="province" placeholder="点击选择省市" readonly="readonly" />
+								<input type="hidden" id="value1" value="" />
+					</li>
+					<li>
+						<span class="left">选择地址：</span><input type="text" id="street" placeholder="点击选择详细地址" readonly="readonly" />
+								<input type="hidden" id="value2" value="" />
+					</li>
+					<li>
+						<span class="left">店铺地址：</span><input type="text" id="shopAddress"  placeholder="请输入店铺地址" />
+					</li>
+					<li>
+						<span class="left">选择站点：</span><input type="text" name="sel_websit" id="sel_websit" data="" value="" readonly="readonly" />
+					</li>
+					<li>
+						<span class="left">推荐人ID：</span><input type="text" name="recommend_id" id="recommend_id" placeholder="请输入推荐人ID" data="" value=""  /><span class="float_right padding_right24"><img src="../img/wenhao.png"/></span><div style="clear: both;"></div>
+					</li>
+					<li>
+						<span class="left">推荐人：</span><input type="text" name="recommend_name" id="recommend_name" placeholder="请输入推荐人店铺名称" data="" value=""  />
+					</li>
+					<li class="apply_service_txt">
+						<p>特别说明：</p>
+						<textarea name="" id="shopText" placeholder="在这里输入您想说的话"></textarea>
+					</li>
+				</ul>
+				<dl class="apply_suc hidden">
+					<dt>您的申请提交成功</dt>
+					<dd>
+						<p>稍后业务经理为您服务</p>
+						<p>服务热线：400-0169-682</p>
+						<a href="tel:400-800-9696" class="">立即呼叫</a>
+					</dd>
+				</dl>
+			</div>
+			<button class="submit_btn" >提交申请</button>
+		</div>
+		<div class="login_bottom">
+			说明：登陆/申请服务说明您已同意<a href="javascritp:void(0)">《果速送合作协议》</a>
+		</div>
+	</body>
+	<!-- build:js js/min/apply_service.min.js -->
+	<script src="../quote/jquery-1.8.3.min.js" type="text/javascript" charset="utf-8"></script>
+	<script src="../quote/mobile-util.js" type="text/javascript" charset="utf-8"></script>
+	<script src="../js/common.js" type="text/javascript" charset="utf-8"></script>
+	<script src="../quote/mdData.js" type="text/javascript" charset="utf-8"></script>
+	<script src="../js/LArea.js" type="text/javascript" charset="utf-8"></script>
+	<script src="../js/LArea1.js" type="text/javascript" charset="utf-8"></script>
+	<script src="../js/login_register.js" type="text/javascript" charset="utf-8"></script>
+	<!-- endbuild -->
+</html>

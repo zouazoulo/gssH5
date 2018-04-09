@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<meta name="viewport" content="width=750,user-scalable=no"/>
+    	<meta content="telephone=no, address=no" name="format-detection" />
+		<!-- build:css ../css/common.css -->
+	    <link rel="stylesheet" type="text/css" href="../css/rest.css"/>
+	    <link rel="stylesheet" type="text/css" href="../css/base.css"/>
+	    <!-- /build -->
+		<script type="text/javascript" src="http://res.wx.qq.com/open/js/jweixin-1.0.0.js"></script>
+		<title>订单支付</title>
+	</head>
+	<body>
+		<div class="header-wrap">
+			<div class="header_left moreDoogs_header_left sprite arrow_left_orange">
+				返回
+			</div>
+			<h2 class="index_tit header_tit">
+				订单支付
+			</h2>
+		</div>
+		<div class="empty"></div>
+		<div class="main-wrap">
+			<div class="main">
+				<div class="order_pay_order_info">
+					<div class="order_pay_order_code">
+						订单编号: <span></span>
+					</div>
+					<div class="order_pay_order_money">
+						支付金额: <span></span>
+					</div>
+				</div>
+				<ul class="order_pay_mode_box">
+					<li id="weixin">
+						<dl>
+							<dt class="sprite_login icon_mine_wechat"></dt>
+							<dd class="order_pay_mode_center">微信支付</dd>
+							<dd class="order_pay_mode_right sprite_login icon_chosen_a"  data='1'></dd>
+						</dl>
+					</li>
+					<!--<li id="zhifubao">
+						<dl>
+							<dt class="sprite_login icon_pay_ali"></dt>
+							<dd class="order_pay_mode_center">
+								支付宝支付
+							</dd>
+							<dd class="order_pay_mode_right">
+								<img src="../img/icon_chose_a.png" data='2'/>
+							</dd>
+						</dl>
+					</li>-->
+					<li id="yinhangka">
+						<dl>
+							<dt class="sprite_login icon_pay_card"></dt>
+							<dd class="order_pay_mode_center">银行卡支付</dd>
+							<dd class="order_pay_mode_right sprite_login icon_chosen_a" data='3'></dd>
+						</dl>
+					</li>
+				</ul>
+				<form action="https://wap.lianlianpay.com/payment.htm" method="post" id="form1">
+					<input type="hidden" name="req_data" id="input1" value='' />
+				</form>
+				<div class="true_order no_pay" style="background: #999;">
+					确认支付
+				</div>
+				<div class="pay_msg">
+					由于微信支付策略问题，暂时无法支付。如需支付请下载APP使用支付宝支付。
+				</div>
+			</div>
+		</div>
+	</body>
+	<script src="../quote/jquery-1.8.3.min.js" type="text/javascript" charset="utf-8"></script>
+	<script src="../quote/mobile-util.js" type="text/javascript" charset="utf-8"></script>
+	<script src="../js/common.js" type="text/javascript" charset="utf-8"></script>
+	<script src="../quote/mdData.js" type="text/javascript" charset="utf-8"></script>
+	<script type="text/javascript">
+		$(document).ready(function(){
+			var pub = {};
+			$.extend(pub,{
+				logined : common.getIslogin(),
+				code:common.getUrlParam("code"),
+				weixin : sessionStorage.weixin == undefined ? false : JSON.parse(sessionStorage.weixin),
+				order_msg : sessionStorage.order_pay == undefined ? false : JSON.parse(sessionStorage.order_pay),
+				openId : localStorage.getItem("openid")
+			});
+			if (pub.logined) {
+				pub.websiteNode = common.websiteNode;
+				pub.tokenId = common.tokenId();
+				pub.orderCode = pub.order_msg == false ? null : pub.order_msg.orderCode;
+				pub.realPayMoney = pub.order_msg == false ? null : pub.order_msg.realPayMoney;
+				pub.source = "orderCode"+pub.order_msg.orderCode;
+				pub.sign = md5( "orderCode"+pub.order_msg.orderCode + "key" + common.secretKey() ).toUpperCase();
+				pub.publicParameter = {
+					orderCode : pub.orderCode,
+					source : pub.source,
+					sign : pub.sign,
+					tokenId : pub.tokenId
+				}
+			}
+			pub.pay = {
+				init:function(){
+					pub.pay.api();
+					pub.pay.eventHeadle.init();
+					!pub.openId && pub.code && pub.pay.get_openid();
+				},
+				get_openid:function(){
+					common.ajaxPost({
+						method:'get_weixin_code',
+						weixinCode:pub.code,
+						websiteNode:pub.websiteNode
+					},function(data){
+						console.log(JSON.stringify(data));
+						if (data.statusCode=='100000') {
+							if (data.data.fromWX == 1) {
+								localStorage.setItem("openid",data.data.openId)
+							}
+						}else{
+							common.prompt(data.statusStr)
+						}
+					})
+				},
+				api:function(){
+					if (pub.order_msg) {
+						$('.order_pay_order_code span').html(pub.orderCode);
+						$('.order_pay_order_money span').html(pub.realPayMoney+'元');
+						if (common.isWeiXin()) {
+							pub.pay_sel = 0;
+						} else{
+							pub.pay_sel = 1;
+							$('#weixin').addClass("hidden");
+						}
+						$('.order_pay_mode_box li').eq(pub.pay_sel).addClass("true");
+						$('.order_pay_mode_box .order_pay_mode_right').eq(pub.pay_sel).addClass("icon_chosen").removeClass("icon_chosen_a");
+					}
+				},
+				llpay:function(){
+					common.ajaxPost($.extend(pub.publicParameter,{
+						method:'order_topay_llpay',
+					}),function(data){
+						if (data.statusCode=='100000') {
+							var str=JSON.stringify(data.data);
+							$('#input1').attr('value',str);
+							$('#form1').submit()
+						}else{
+							common.prompt(data.statusStr);
+						}
+					})
+				},
+				wxpay:function(){
+					common.ajaxPost($.extend(pub.publicParameter,{
+						method:"goto_pay_weixin",
+						url:common.http,
+						websiteNode:pub.websiteNode,
+						openId:pub.openId,
+					}),function(data){
+						if(data.statusCode == '100200'){
+							alert("微信提交订单异常，请重新操作!");
+						}else if(data.statusCode == '100000'){
+							//获取PrepayId
+							//调用微信支付JSAPI
+							var result = data.data;
+							var prepayId = result.prepayId;
+							var nonceStr = result.nonceStr;
+							var timeStamp = result.timeStamp;
+							var packages = result.package;//"prepay_id="+prepayId;
+							var paySign = result.paySign;
+							var appId = result.appId;
+							var signType = result.signType;
+							var configSign = result.configSign;
+							var timestamp = result.timestamp;
+							var noncestr = result.noncestr;						
+						   	wx.config({
+							    debug: false, // 开启调试模式,调用的所有api的返回值会在客户端alert出来，若要查看传入的参数，可以在pc端打开，参数信息会通过log打出，仅在pc端时才会打印。
+							    appId: appId, // 必填，公众号的唯一标识
+							    timestamp:timestamp, // 必填，生成签名的时间戳
+							    nonceStr: noncestr, // 必填，生成签名的随机串
+							    signature: configSign,// 必填，签名，见附录1
+							    jsApiList: ["chooseWXPay"] // 必填，需要使用的JS接口列表，所有JS接口列表见附录2
+							});
+						    wx.ready(function(){
+						    	wx.chooseWXPay({
+						    	    timestamp: timeStamp, // 支付签名时间戳，注意微信jssdk中的所有使用timestamp字段均为小写。但最新版的支付后台生成签名使用的timeStamp字段名需大写其中的S字符
+						    	    nonceStr: nonceStr, // 支付签名随机串，不长于 32 位
+						    	    package: packages, // 统一支付接口返回的prepay_id参数值，提交格式如：prepay_id=***）
+						    	    signType: signType, // 签名方式，默认为'SHA1'，使用新版支付需传入'MD5'
+						    	    paySign: paySign, // 支付签名
+						    	    success: function (res) {
+						    	        //支付成功后的回调函数
+										window.location.href='order_management.html';
+						    	    }
+						    	})
+						    })
+						}else{
+							common.prompt(data.statusStr)
+						}
+					})
+				}
+			}
+			
+			pub.pay.eventHeadle = {
+				init:function(){
+					$('.true_order').on('click',function(){
+						var pay = $(this).is(".no_pay");
+						if (!pay) {
+							if (pub.pay_sel == '0') {
+								pub.openId && pub.pay.wxpay();
+							}
+							if (pub.pay_sel == '1' ) {
+								pub.pay.llpay();
+							}
+						}
+						
+					});
+					$(".header_left").on('click',function(){
+						window.location.href ="order_details.html?v=0.1"
+					});
+					$('.order_pay_mode_box li').on('click',function(){
+						if (!$(this).is(".true")) {
+							$(this).addClass("true").find('.order_pay_mode_right').removeClass("icon_chosen_a").addClass("icon_chosen").end().siblings().removeClass("true").find('.order_pay_mode_right').removeClass("icon_chosen").addClass("icon_chosen_a")
+							pub.pay_sel = $(this).index();
+						};
+					});
+					$(window).load(function(){
+						common.jsadd()
+					});
+					common.fadeIn()
+				}
+			}
+			
+			pub.init = function(){
+				pub.pay.init();
+			}
+			pub.init();
+		})
+	</script>
+</html>

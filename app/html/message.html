@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<meta name="viewport" content="width=750,user-scalable=no"/>
+    	<meta content="telephone=no, address=no" name="format-detection" />
+		<!-- build:css ../css/common.css -->
+	    <link rel="stylesheet" type="text/css" href="../css/rest.css"/>
+	    <link rel="stylesheet" type="text/css" href="../css/base.css"/>
+	    <!-- /build -->
+		<title>消息</title>
+	</head>
+	<body>
+		<div class="header-wrap message">
+			<div class="header_left header_back sprite arrow_left_orange"></div>
+			<div class="index_tit header_tit">
+				消息
+			</div>
+		</div>
+		<div class="empty"></div>
+		<div class="main-wrap">
+			<div class="main message">
+				<div class="message_box">
+					
+				</div>
+				<p class="lodemore"></p>
+				<!--<div class="message_item">
+					<div class="message_item_top clearfloat">
+						<div class="message_tit">
+							标题
+						</div>
+						<div class="message_time">
+							时间
+						</div>
+					</div>
+					<div class="message_count">
+						内容
+					</div>
+				</div>-->
+			</div>
+		</div>
+		<div class="footer-wrap">
+			<div class="footer1">
+				<dl class="no" data = "../index.html">
+					<dt class="sprite tab_bar_home_a"></dt>
+					<dd>首页</dd>
+				</dl>
+				<dl class="no" data = 'moregoods.html?type=1'>
+					<dt class="sprite tab_bar_more_a"></dt>
+					<dd>更多商品</dd>
+				</dl>
+				<dl class="no" data = "wo.html">
+					<dt class="sprite tab_bar_mine_a"></dt>
+					<dd>我</dd>
+				</dl>
+				<dl class="yes">
+					<dt class="sprite tab_bar_Message_b"></dt>
+					<dd>消息</dd>
+				</dl>
+			</div>
+		</div>
+	</body>
+	<script src="../quote/jquery-1.8.3.min.js" type="text/javascript" charset="utf-8"></script>
+	<script src="../quote/mobile-util.js" type="text/javascript" charset="utf-8"></script>
+	<script src="../quote/mdData.js" type="text/javascript" charset="utf-8"></script>
+	<script src="../js/common.js" type="text/javascript" charset="utf-8"></script>
+	<script src="../quote/layer.js" type="text/javascript" charset="utf-8"></script>
+	<script type="text/javascript">
+		$(document).ready(function(){
+			var pub = {};
+			$.extend(pub,{
+				data:'',
+				method:'mipush_msgrcd_show',
+				html:'',
+				isLast:false,
+				firmId:common.user_data().firmInfoid,
+				pageSize:common.pageSize,
+				pageNo:common.pageNo,
+				source:'firmId'+common.user_data().firmInfoid,
+				sign:md5('firmId'+common.user_data().firmInfoid+"key"+common.secretKey()).toUpperCase()
+			})
+			pub.message = {
+				init:function(){
+					pub.message.api();
+					pub.message.eventHeadle.init();
+				},
+				api:function(){
+					common.ajaxPost({
+						method:pub.method,
+						firmId:pub.firmId,
+						pageSize:pub.pageSize,
+						pageNo:pub.pageNo,
+						tokenId:common.tokenId(),
+						sign:pub.sign,
+						source:pub.source
+					},function(data){
+						console.log(data)
+						if (data.statusCode=='100000') {
+							pub.isLast = data.data.isLast;
+							//if (data.data.objects.length != 0) {
+								pub.message.listShow(data.data.objects);
+								sessionStorage.removeItem("new_msg");
+							//}
+						} else{
+							common.prompt(data.statusStr);
+						}
+					})
+				},
+				listShow:function(data){
+					pub.html = '';
+					for (var i in data) {
+						pub.html +='<div class="message_item">'
+						pub.html +='	<div class="message_item_top clearfloat">'
+						pub.html +='		<div class="message_tit">'+data[i].msgTitle+'</div>'
+						pub.html +='		<div class="message_time">'+data[i].createTime+'</div>'
+						pub.html +='	</div>'
+						pub.html +='	<div class="message_count">'+data[i].messageContent+'</div>'
+						pub.html +='</div>'
+					};
+					$(".main.message .message_box").append(pub.html);
+					if (pub.isLast) {
+						$(".lodemore").html("没有更多数据了！");
+					}else{
+						$(".lodemore").html("点击加载更多！");
+					}
+				}
+			}
+			pub.message.eventHeadle={
+				init:function(){
+					//点击返回按钮
+					common.callback($(".header_left"))
+					$(".score_message_box").on('click','.message_button',function(){
+						pub.message.exchangeapi($(this).attr("data"))
+					});
+					$('.lodemore').on('click',function(){
+						if (!pub.isLast) {
+							pub.pageNo ++ ;
+							pub.message.api();
+						}
+					});
+					$('.footer1 dl').on('click',function(){
+						$(this).is('.no') && common.jump($(this).attr("data"))
+					});
+					$(window).load(function(){
+						common.jsadd();
+					});
+					common.fadeIn()
+				}
+			}
+			
+			pub.message.init();
+			
+		})
+	</script>
+</html>
