@@ -63,7 +63,7 @@ $(document).ready(function(){
 		getImg:function(r){
 			var im = new Image();
 			im.src = r ; 
-			console.log(im.complete)
+
 			if(im.complete){
 				return "<img src = "+r+" />"
 			}else{

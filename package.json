@@ -34,6 +34,11 @@
     "gulp-sequence": "^0.4.6",
     "gulp-uglify": "^3.0.0",
     "gulp-useref": "^3.1.2",
-    "imagemin-pngquant": "^5.0.1"
+    "imagemin-pngquant": "^5.0.1",
+    "grunt": "^1.0.2",
+    "grunt-contrib-clean": "^1.1.0",
+    "grunt-contrib-cssmin": "^2.2.1",
+    "grunt-contrib-uglify": "^3.3.0",
+    "grunt-contrib-watch": "^1.0.0"
   }
 }

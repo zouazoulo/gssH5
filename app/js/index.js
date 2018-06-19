@@ -97,10 +97,26 @@ $(document).ready(function(){
 		//banner
 		index_load:function(data){
 			var html='',v = data.data.adInfoList;
+			var address = window.location.href;
+			var n = address.indexOf("index.html");
+			var m = address.indexOf(".html");
+			var state = common.getUrlParam("state");
+			var _n = address.indexOf("?");
+			if (state) {
+				var add = address.substr(0,_n)+"html/";
+			}else{
+				if (m == '-1') {
+					var add = address + "html/";				
+				}else{
+					var add = address.substr(0,n)+"html/";
+				}
+			}
 			for (var i=0 in v){
-				html += '<div class="swiper-slide"><a href="'+((v[i].linkUrl == '') ? "javascript:void(0)" : v[i].linkUrl)+'"><img src="'+v[i].adLogo+'" /></a></div>'
+				var linkUrl = getLinkUrl(v[i].jumpType , v[i].linkUrl , v[i].adTime);
+				html += '<div class="swiper-slide"><a href="'+(!linkUrl ? "javascript:void(0)" : linkUrl)+'"><img src="'+v[i].adLogo+'" /></a></div>'
 			}
 			$(".banner .swiper-wrapper").append(html);
+			
 			var mySwiper = new Swiper ('.banner', {
 			    direction: 'horizontal',
 			    loop: true,
@@ -109,6 +125,20 @@ $(document).ready(function(){
 			    // 如果需要分页器
 			    pagination: '.swiper-pagination'
 			});
+			
+			function getLinkUrl(type,code,tit){
+				if (type) {
+					if (type == 1) {
+						var codeArr = code.split("&");
+						return add + "moreGoods.html?typeCode="+codeArr[1];
+					}else if (type == 2) {
+						return add + "goodsDetails.html?goodsId="+code;
+					}else if (type == 3) {
+						return add + "details.html?linUrl="+code + "&title="+tit;
+					}
+				}
+				return null;
+			}
 		},
 		//广告通知
 		index_guanggao:function (data){

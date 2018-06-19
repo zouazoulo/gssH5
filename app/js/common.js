@@ -1,8 +1,8 @@
 //请求地址公用 获取tokenId公用
 var common={
-	http:"http://app.guoss.cn/gss_api/server/api.do",
-	//http:"http://61.164.118.197:8090/gssapi/server/api.do",
-	//http:"http://61.164.113.199:8081/gss_api/server/api.do",
+	http:"http://app.guoss.cn/gss_api/server/api.do", // 正式
+	//http:"http://app.guoss.cn/gss_api/server/api.do", // 正式
+	//http:"http://app.guoss.cn/gss_api/server/api.do", // 正式
 	websiteNode:'3301',//请求的站点
 	pageSize:'10',//请求商品每页的个数
 	pageNo:'1',
@@ -21,7 +21,7 @@ var common={
 		}
 	},
 	appid:{
-		"3301":'wx4e26ee7446c5aa37',
+		"3301":"wx4e26ee7446c5aa37", // 正式
 		"3201":'wx6a8d195d6acf1614',
 		"3302":'wx8cc1a343dd5c87ac',
 	},
@@ -31,7 +31,7 @@ var common={
 		'3302':'宁波站'
 	},
 	httpData:{
-		"3301":"http://wxhz.guoss.cn/html/login.html",
+		"3301":"http://wxhz.guoss.cn/html/login.html", // 正式
 		"3201":"http://wxnj.guoss.cn/html/login.html",
 		"3302":"http://wxnb.guoss.cn/html/login.html"
 	},
@@ -338,3 +338,15 @@ common.ajaxPost = function(data, done, fail){
 		error : fail
 	});
 };
+(function(){
+	var div = $("<h5 class='networkError'>您的网络好像不太给力</h5>");
+	
+	window.addEventListener('online',  function(){
+		$(".networkError").length && $("body").find(".networkError").remove()
+	});
+	window.addEventListener('offline', function(){
+		if ($(".networkError").length == 0) {
+			$("body").append(div)
+		}
+	});
+})()
