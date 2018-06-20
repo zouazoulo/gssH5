@@ -68,7 +68,8 @@ $(document).ready(function(){
 		},
 		ajax_index_data:function(){
 			common.ajaxPost({
-				method:'main_page_show',
+				//main_page_show_two   main_page_show
+				method:'main_page_show_two',
 				websiteNode:pub.websiteNode
 			},function(data){
 				if (data.statusCode == 100000) {

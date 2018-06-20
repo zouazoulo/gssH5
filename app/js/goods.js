@@ -508,7 +508,8 @@ $(document).ready(function(){
 		},
 		api:function(){
 			common.ajaxPost({
-				method:"goods_get_by_id",
+				//goods_get_by_id_two  goods_get_by_id
+				method:"goods_get_by_id_two",
 				goodsId:pub.goodsId,
 				userId:pub.userId
 			},function(data){
@@ -567,18 +568,21 @@ $(document).ready(function(){
 			//展示商品图片
 			var arr1=data.data.goodsPics.split('@');
 			//var isVideo = (arr1[0].indexOf(".mp4") != -1)
-			var isVideo = false;
+			var isVideo = (arr1[0].indexOf(".mp4") != -1);
 			if (isVideo) {
 				pub.html += '<div id="video" class="swiper-slide" style="width: 750px; height: 600px;">'
 				pub.html += '	<img class="video_payImg" src="'+arr1[1]+'" />'
 				pub.html += '	<div class="video_pay"></div>'
 				pub.html += '	<div id="mainVideoDiv" class="mod_video_main">'
-				pub.html += '		<video id="mainVideo" preload="none" webkit-playsinline="true" playsinline="" controls="controls" width="1" height="2"  fristplay="no">'
-				pub.html += '			<source src="'+arr1[0]+'" type="video/mp4">'
+				pub.html += '		<video id="mainVideo" preload="none" webkit-playsinline="true" x5-playsinline="true" playsinline="true" controls="controls" width="100%" height="100%" style="max-height: 480px;"  fristplay="no">'
+				//style="object-fit:fill"
+				pub.html += '			<source src="'+arr1[0]+'?v=01" type="video/mp4">'
+				//pub.html += '			<source src="https://1251412368.vod2.myqcloud.com/vodtransgzp1251412368/7447398156007696008/v.f20.mp4?dockingId=f84735d2-21c2-4a5a-83a1-d56dcab9a5a0&storageSource=1" type="video/mp4">'
 				pub.html += '			暂时不支持播放该视频'
 				pub.html += '		</video>'
 				pub.html += '	</div>'
-				pub.html += '	<div id="mainVideoClose" class="video_close" style="margin-top: 10px; display: inline-block;">退出播放</div>'
+				//pub.html += '	<div id="mainVideoClose" class="video_close" style="margin-top: 10px; display: inline-block;">退出播放</div>'
+				pub.html += '	<div id="mainVideoClose" class="video_close" style="margin-top: 10px; display: none;">退出播放</div>'
 				pub.html += '</div>'
 				
 				if (arr1.length > 2) {
@@ -605,17 +609,68 @@ $(document).ready(function(){
 				var marTop = (600 - myVideo.height())/2;
 					myVideoDiv.css("margin-top",'-1440px');
 				
+				
 				$(".video_payImg,.video_pay").on("click",function(){
 					
-					change(true);
+					sessionStorage.getItem("isVideoPay") ? change(true) : (function(){
+						try{
+							common.createPopup({
+			                    flag: 4,
+			                    icon: 'none',
+			                    msg: true ? '播放本视频将消耗您的流量，建议在WiFi环境下播放' : '商品介绍视频将帮助您更清晰了解商品，但也将耗费较多流量，建议在WiFi环境下查看。',
+			                    okText: '立即播放',
+			                    cancelText: '下次再看',
+			                    onConfirm: function() {
+			                    	sessionStorage.setItem("isVideoPay",true);
+			                    	change(true)
+			                    }
+			                });
+						}catch(e){
+							alert(e)
+						}
+					})()
+					
 					
 				});
 				$("#mainVideoClose").on("click",function(){
 					change(false);
 				});
-				myVideo[0].addEventListener("ended",function(){
+				
+				video[0].addEventListener("pause",function(){
+					//change(false);
+					//exitFullscreen();
+					//myVideoDiv.css("margin-top",'-9999px');
+				});
+				video[0].addEventListener("play",function(){
+					//change(false);
+					//exitFullscreen();
+					setTimeout(function(){
+						var h = $("#mainVideo").height();
+						if (h >= 530) {
+							myVideoDiv.css("margin-top",'0px');
+						}else{
+							marTop = (600 - h)/2;
+							myVideoDiv.animate({"margin-top":marTop+'px'});
+						}
+					},500)
+					
+				})
+				video[0].addEventListener("ended",function(){
 					change(false);
 					exitFullscreen();
+				})
+				video[0].addEventListener("timeupdate",function(){
+					console.log("timeupdate");
+					
+				})
+				video[0].addEventListener("suspend",function(){
+					//console.log("视频被阻塞了")
+				})
+				video[0].addEventListener("x5videoexitfullscreen", function(){
+				    //alert("exit fullscreen")
+				})
+				video[0].addEventListener("x5videoenterfullscreen", function(){
+				    //alert("enter fullscreen")
 				})
 			}
 			
@@ -634,18 +689,19 @@ $(document).ready(function(){
 			});
 			function change(d){
 				if (d) {
-					video.addClass("video");
+					myVideo.addClass("video");
 					pay.hide();
-					close.css({"margin-top":'10px',"display":'inline-block'});
-					myVideoDiv.css("margin-top",marTop+'px');
-					myVideo.get(0).play();
+					//close.css({"margin-top":'10px',"display":'inline-block'});
+					myVideoDiv.css("margin-top",'0px');
+					video.get(0).play();
 					
 				}else{
-					video.removeClass("video");
+					myVideo.removeClass("video");
 					pay.show();
-					close.css({"margin-top":'10px',"display":'none'});
-					myVideoDiv.css("margin-top",'-1440px');
-					myVideo.get(0).pause();
+					//close.css({"margin-top":'10px',"display":'none'});
+					video.get(0).pause();
+					myVideoDiv.css("margin-top",'-9999px');
+					
 				}
 			}
 			//进入全屏
