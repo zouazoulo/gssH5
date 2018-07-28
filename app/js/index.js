@@ -1,13 +1,33 @@
 $(document).ready(function(){
 	//命名空间
 	var pub = {};
+	pub.getAdd = function(){
+		var address = window.location.href;
+		var n = address.indexOf("index.html");
+		var m = address.indexOf(".html");
+		var state = common.getUrlParam("state");
+		var _n = address.indexOf("?");
+		var add = '';
+		if (state) {
+			add = address.substr(0,_n)+"html/";
+		}else{
+			if (m == '-1') {
+				add = address + "html/";				
+			}else{
+				add = address.substr(0,n)+"html/";
+			}
+		}
+		return add;
+	};
 	$.extend(pub,{
 		code : common.getUrlParam("code"),
 		wexinCode:sessionStorage.weixinCode,
 		websiteNode:common.websiteNode,
 		logined:common.getIslogin(),
-		openid:localStorage.getItem("openid")
+		openid:localStorage.getItem("openid"),
+		add : pub.getAdd()
 	});
+	
 	if (pub.logined) {
 		pub.firmId = common.user_data().firmInfoid;
 		pub.source='firmId'+common.user_data().firmInfoid;
@@ -61,15 +81,14 @@ $(document).ready(function(){
 						console.log("没有新消息")
 					}
 				}else{
-					
 					common.prompt(data.statusStr)
 				}
 			})
 		},
 		ajax_index_data:function(){
 			common.ajaxPost({
-				//main_page_show_two   main_page_show
-				method:'main_page_show_two',
+				//main_page_show_three main_page_show_two   main_page_show
+				method:'main_page_show_three',
 				websiteNode:pub.websiteNode
 			},function(data){
 				if (data.statusCode == 100000) {
@@ -97,23 +116,10 @@ $(document).ready(function(){
 		},
 		//banner
 		index_load:function(data){
-			var html='',v = data.data.adInfoList;
-			var address = window.location.href;
-			var n = address.indexOf("index.html");
-			var m = address.indexOf(".html");
-			var state = common.getUrlParam("state");
-			var _n = address.indexOf("?");
-			if (state) {
-				var add = address.substr(0,_n)+"html/";
-			}else{
-				if (m == '-1') {
-					var add = address + "html/";				
-				}else{
-					var add = address.substr(0,n)+"html/";
-				}
-			}
+			var html='',v = data.data.topList;
+			
 			for (var i=0 in v){
-				var linkUrl = getLinkUrl(v[i].jumpType , v[i].linkUrl , v[i].adTime);
+				var linkUrl = pub.index.getLinkUrl(v[i].jumpType , v[i].linkUrl , v[i].adTime);
 				html += '<div class="swiper-slide"><a href="'+(!linkUrl ? "javascript:void(0)" : linkUrl)+'"><img src="'+v[i].adLogo+'" /></a></div>'
 			}
 			$(".banner .swiper-wrapper").append(html);
@@ -127,19 +133,13 @@ $(document).ready(function(){
 			    pagination: '.swiper-pagination'
 			});
 			
-			function getLinkUrl(type,code,tit){
-				if (type) {
-					if (type == 1) {
-						var codeArr = code.split("&");
-						return add + "moreGoods.html?typeCode="+codeArr[1];
-					}else if (type == 2) {
-						return add + "goodsDetails.html?goodsId="+code;
-					}else if (type == 3) {
-						return add + "details.html?linUrl="+code + "&title="+tit;
-					}
-				}
-				return null;
+			var v2 = data.data.centerList;
+			if (v2.length != 0) {
+				var linkUrl1 = pub.index.getLinkUrl(v2[0].jumpType , v2[0].linkUrl , v2[0].adTime);
+				var html1 = '<a href="'+(!linkUrl1 ? "javascript:void(0)" : linkUrl1)+'"><img src="'+v2[0].adLogo+'" /></a>'
+				$(".index-advertisement-wrap .index-advertisement").html(html1).css("display","block");
 			}
+			
 		},
 		//广告通知
 		index_guanggao:function (data){
@@ -214,55 +214,96 @@ $(document).ready(function(){
 		//商品
 		index_goodsItem:function (data){
 			var html='',v = data.data.mainActivityList,o;
-			for (var i=0 in v){
-				html +='<div class="main'+(i+1)+'">'
-				html +='<h3 class="center_tit">'+v[i].activityName+'</h3>'
-				html +='<div class="center_goodes clearfloat">'
+			for (var i=0 , vl = v.length; i < vl; i++){
+				var line = getLineNum(v[i].rowNum),
+					column = getColumnNum(v[i].goodsNum),
+					listData = v[i].activityDetailsList,
+					l = listData.length,
+					le = l > line * column ? line * column : l;
+				html +='<div class="index-module index-module'+column+'">'
+				html +='	<div class="index-module-title clearfloat">'
+				html +='			<div class="float_left">'+v[i].activityName+'</div>'
+				var linkUrl = pub.index.getLinkUrl(v[i].jumpType , v[i].linkUrl , '');
+				html +='			<div class="float_right"><a href="'+(!linkUrl ? "javascript:void(0)" : linkUrl)+'">更多</a></div>'
+				html +='	</div>'
 				
-				for (var j in v[i].activityDetailsList) {
-					o = v[i].activityDetailsList[j].goodsInfo;
+				html +='	<div class="index-module-goods clearfloat">'
+				
+				for(var j = 0; j < le; j++ ){
+					o = listData[j].goodsInfo;
+					
 					if (o) {
-						html +='<dl data="'+o.id+'">'
-						html +='	<dt><img src="'+o.goodsLogo+'"/></dt>'
-						html +='	<dd>'+o.goodsName+'</dd>'
-						html +='	<dd class="clearfloat">'
-							if (parseInt(o.setupTags)!='0') {
-									html +='<div class="index_goods_icon">'
-								if (o.isSale) {
-									html +=' <span class = "icon_cu"></span>'
+						
+						html +='		<dl class="index-module-item clearfloat" data="'+o.id+'">'
+						html +='			<dt><img src="'+o.goodsLogo+'"/></dt>'
+						html +='			<dd>'
+						if (column == 3) {
+							html +='				<p class="good_name ellipsis">'+o.goodsName+'</p>'
+							html +='				<div class="good_box">'
+							html +='					<p><span class="good_price">'+o.gssPrice+'</span>元/'+o.priceUnit+'</p>'
+							html +='				</div>'
+						}else{
+							html +='				<p class="good_name ellipsis">'+o.goodsName+'</p>'
+							html +='				<p class="good_describe ellipsis">箱装，每箱大约16个</p>'
+							html +='				<p class="good_tag">'
+								if(listData[j].noteTable){
+									html += '					<span>'+listData[j].noteTable+'</span>'
 								}
-								if (o.isNew) {
-									html +=' <span class = "icon_ji"></span>'
-								}
-								if (o.isRecommend) {
-									html +=' <span class = "icon_jian"></span>'
-								}
-								if (o.isHot) {
-									html +=' <span class = "icon_re"></span>'
-								}
-									html +='</div>'
-									if (o.isSale && o.isNew && o.isRecommend && o.isHot) {
-										html +='<div class="index_goods_pirce index_goods_pirce2 index_goods_pirce3"><span>'+o.gssPrice+'</span>元/'+o.priceUnit+'</div>'
-									}else{
-										html +='<div class="index_goods_pirce index_goods_pirce2"><span>'+o.gssPrice+'</span>元/'+o.priceUnit+'</div>'
-									}
-							} else{
-								html +='<div class="index_goods_pirce"><span>'+o.gssPrice+'</span>元/'+o.priceUnit+'</div>'
-							}
-						html +='	</dd>'
-						html +='	</dl>'
-					}
+							html += '				</p>'
+							html +='				<div class="good_box clearfloat">'
+							html +='					<div class="float_left">'
+							html +='						<p class="del"><del>'+o.wholeGssPrice+'</del></p>'
+							html +='						<p><span class="good_price">'+o.gssPrice+'</span>元/'+o.priceUnit+'</p>'
+							html +='					</div>'
+							html +='					<div class="float_right">'
+							html +='						<span class="button">立即购买</span>'
+							html +='					</div>'
+							html +='				</div>'
+							
+						}
+						html +='			</dd>'
+						html +='		</dl>'
+					};
 				}
+				
+				html +='	</div>'
 				html +='</div>'
-				html +='</div>'
-			}
-			$(".center").append(html);
+			};
+			$(".center").html(html);
+			
 			if(!common.getIslogin()){
 				$('.center_goodes dl .clearfloat .index_goods_pirce').hide()
 			}
-			var good=$(".center_goodes dl");
-			common.txq(good,1)
+			var good=$(".index-module dl");
+			common.txq(good,1);
+			//返回创建的多少列商品
+			function getColumnNum(d){
+				if (d == 1 || d == 2 || d == 3) {
+					return d;
+				}
+				return 1;
+			};
+			//返回创建多少行商品
+			function getLineNum(d){
+				if (d >= 1) {
+					return parseInt(d);
+				}
+				return 1;
+			}
 		},
+		getLinkUrl : function (type,code,tit){
+			if (type) {
+				if (type == 1) {
+					var codeArr = code.split("&");
+					return pub.add + "moreGoods.html?typeCode="+codeArr[1];
+				}else if (type == 2) {
+					return pub.add + "goodsDetails.html?goodsId="+code;
+				}else if (type == 3) {
+					return pub.add + "details.html?linUrl="+code + "&title="+tit;
+				}
+			}
+			return null;
+		}
 	};
 	pub.index.eventHeadle = {
 		init:function(){
@@ -275,31 +316,6 @@ $(document).ready(function(){
 				sessionStorage.removeItem("goodtype");
 				$(this).is('.no') && common.jump($(this).attr("data"))
 			});
-			/*$('.gonggao').on('click',"li",function(){
-				var d = JSON.parse($(this).attr("data"));
-				var $ele = $("#logistic_show");
-				$(".my_bg,#logistic_show").removeClass("hidden")
-				$ele.find(".logistic_show_title").html(d.noticeTitle);
-				$ele.find(".logistic_show_text").html(((d.noticeContent).toString()).replace(/\r\n/g, "<br/>"));
-				window.history.pushState({foo:"alert"},'alert', 'alert');
-			});
-			$("body").on("click",".logistic_back,.my_bg",function(){
-				$(".my_bg,#logistic_show").addClass("hidden");
-				window.history.replaceState({foo:"index"},'index', 'index.html');
-			})
-			window.addEventListener('popstate', function(e){
-				if (history.state){
-					var state = e.state;
-				    if (state.foo == "index") {
-				    	window.history.replaceState({foo:"index"},'index', 'index.html');
-				    	$(".my_bg,#logistic_show").addClass("hidden");
-				    }else if(state.foo == "alert"){
-				    	window.history.replaceState({foo:"alert"},'alert', 'alert');
-				    	$(".my_bg,#logistic_show").removeClass("hidden");
-				    }
-				}
-			}, false);
-			window.history.replaceState({foo:"index"},'index', 'index.html');*/
 			$(window).load(function(){
 				common.jsadd("quote/style_pc.js");
 			});
