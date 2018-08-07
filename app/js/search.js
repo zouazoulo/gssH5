@@ -57,7 +57,7 @@ $(document).ready(function(){
 				html +='<dl class="clearfloat" data="'+v[i].id+'">'
 				html +='<dt><img src="'+v[i].goodsLogo+'"/></dt>'
 				html +='<dd>'
-				html +='<h3 class="moreGoods_goods_name">'+v[i].goodsName+'</h3>'
+				html +='<h3 class="moreGoods_goods_name ellipsis">'+v[i].goodsName+'</h3>'
 				html +='<p class="moreGoods_goods_text">'+v[i].goodsShows+'</p>'
 				html +='<p class="moreGoods_goods_price">'
 				html +='	<span class="fontColor">'+v[i].gssPrice+'</span>元/'+v[i].priceUnit+' &nbsp; &nbsp;<span>'+v[i].priceDesc+'</span>'

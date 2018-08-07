@@ -219,49 +219,57 @@ $(document).ready(function(){
 					column = getColumnNum(v[i].goodsNum),
 					listData = v[i].activityDetailsList,
 					l = listData.length,
-					le = l > line * column ? line * column : l;
+					le = l > line * column ? line * column : line * column;
 				html +='<div class="index-module index-module'+column+'">'
 				html +='	<div class="index-module-title clearfloat">'
-				html +='			<div class="float_left">'+v[i].activityName+'</div>'
-				var linkUrl = pub.index.getLinkUrl(v[i].jumpType , v[i].linkUrl , '');
+				html +='			<div class="float_left">'+v[i].activityTitle+'</div>'
+				var linkUrl = pub.index.getLinkUrl(1, v[i].linkUrl , '');
 				html +='			<div class="float_right"><a href="'+(!linkUrl ? "javascript:void(0)" : linkUrl)+'">更多</a></div>'
 				html +='	</div>'
 				
 				html +='	<div class="index-module-goods clearfloat">'
 				
 				for(var j = 0; j < le; j++ ){
-					o = listData[j].goodsInfo;
+					oo = listData[j];
 					
-					if (o) {
+					if (oo) {
+						o = oo.goodsInfo;
 						
 						html +='		<dl class="index-module-item clearfloat" data="'+o.id+'">'
-						html +='			<dt><img src="'+o.goodsLogo+'"/></dt>'
+						html +='			<dt><img src="'+oo.detailsLogoUrl+'"/></dt>'
 						html +='			<dd>'
 						if (column == 3) {
 							html +='				<p class="good_name ellipsis">'+o.goodsName+'</p>'
 							html +='				<div class="good_box">'
-							html +='					<p><span class="good_price">'+o.gssPrice+'</span>元/'+o.priceUnit+'</p>'
+							if(common.getIslogin()){
+								html +='					<p class="good_price_box"><span class="good_price_icon">¥</span><span class="good_price">'+o.gssPrice+'</span><span>&nbsp;/'+o.priceUnit+'</span></p>'
+							}
 							html +='				</div>'
 						}else{
 							html +='				<p class="good_name ellipsis">'+o.goodsName+'</p>'
-							html +='				<p class="good_describe ellipsis">箱装，每箱大约16个</p>'
+							html +='				<p class="good_describe ellipsis">'+o.goodsShows+'</p>'
 							html +='				<p class="good_tag">'
 								if(listData[j].noteTable){
 									html += '					<span>'+listData[j].noteTable+'</span>'
 								}
 							html += '				</p>'
 							html +='				<div class="good_box clearfloat">'
-							html +='					<div class="float_left">'
-							html +='						<p class="del"><del>'+o.wholeGssPrice+'</del></p>'
-							html +='						<p><span class="good_price">'+o.gssPrice+'</span>元/'+o.priceUnit+'</p>'
-							html +='					</div>'
-							html +='					<div class="float_right">'
-							html +='						<span class="button">立即购买</span>'
-							html +='					</div>'
+							if (common.getIslogin()) {
+								html +='					<div class="float_left">'
+								html +='						<p class="del"><del>'+ (o.nomalPrice ? '¥'+o.nomalPrice : '' )+'</del></p>'
+								html +='						<p class="good_price_box"><span class="good_price_icon">¥</span><span class="good_price">'+o.gssPrice+'</span><span>&nbsp;/'+o.priceUnit+'</span></p>'
+								html +='					</div>'
+								html +='					<div class="float_right">'
+								html +='						<span class="button">立即购买</span>'
+								html +='					</div>'
+							}
 							html +='				</div>'
 							
 						}
 						html +='			</dd>'
+						html +='		</dl>'
+					}else{
+						html +='		<dl class="index-module-item clearfloat">'
 						html +='		</dl>'
 					};
 				}
@@ -269,6 +277,7 @@ $(document).ready(function(){
 				html +='	</div>'
 				html +='</div>'
 			};
+			html += '<div class="index-bottom"><span class="index-bottom-box"><span class="index-bottom-text">已经到底了</span></span></div>'
 			$(".center").html(html);
 			
 			if(!common.getIslogin()){
@@ -292,6 +301,7 @@ $(document).ready(function(){
 			}
 		},
 		getLinkUrl : function (type,code,tit){
+			code = code.trim();
 			if (type) {
 				if (type == 1) {
 					var codeArr = code.split("&");
