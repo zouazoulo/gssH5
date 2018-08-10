@@ -1,8 +1,8 @@
 //请求地址公用 获取tokenId公用
 var common={
-	http:"http://app.guoss.cn/gss_api/server/api.do", // 正式
-	//http:"http://app.guoss.cn/gss_api/server/api.do", // 正式
-	//http:"http://app.guoss.cn/gss_api/server/api.do", // 正式
+	http:"http://61.164.113.187:8090/gssapi/server/api.do", // 测试
+	//http:"http://61.164.113.187:8090/gssapi/server/api.do", // 测试
+	//http:"http://61.164.113.187:8090/gssapi/server/api.do", // 测试
 	websiteNode:'3301',//请求的站点
 	pageSize:'10',//请求商品每页的个数
 	pageNo:'1',
@@ -21,7 +21,7 @@ var common={
 		}
 	},
 	appid:{
-		"3301":"wx4e26ee7446c5aa37", // 正式
+		"3301":"wxe92e098badc60fab", // 测试
 		"3201":'wx6a8d195d6acf1614',
 		"3302":'wx8cc1a343dd5c87ac',
 	},
@@ -31,7 +31,7 @@ var common={
 		'3302':'宁波站'
 	},
 	httpData:{
-		"3301":"http://wxhz.guoss.cn/html/login.html", // 正式
+		"3301":"http://testh5.guoss.cn/html/login.html", // 测试
 		"3201":"http://wxnj.guoss.cn/html/login.html",
 		"3302":"http://wxnb.guoss.cn/html/login.html"
 	},
@@ -148,6 +148,32 @@ var common={
 			return 0;
 		}
 		
+	},
+	//实现打开微信公众号的次数统计--通过sessionStorage
+	open_Statistics:function(){
+		var data = {method:'user_login_rcd'};
+		if(common.getIslogin()){
+			data ={
+				method:'user_login_rcd',
+				firmId:common.user_data().firmInfoid
+			};
+		}
+		if (sessionStorage.getItem('isopen') != 1) {
+			open_frequency(data);
+		}
+		function open_frequency(d){
+			$.ajax({
+				url:common.http,
+		        type:"post",
+		        dataType:"jsonp",
+		        data:d,
+				success:function(data){
+					sessionStorage.setItem("isopen",1);
+				},
+				error:function(data){
+				}
+			})
+		}
 	},
 	prompt:function(str){
 		var ele=document.createElement('div');

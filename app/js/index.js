@@ -340,6 +340,7 @@ $(document).ready(function(){
 			var height = hie - 185;
 			
 			common.fadeIn();
+			common.open_Statistics();
 		}
 	}
 	pub.index.init();
