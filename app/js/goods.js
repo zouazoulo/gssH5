@@ -229,6 +229,7 @@ $(document).ready(function(){
 				$(".input_mask p").text("")
 				$(".input_mask").show()
 				$(".number").val(a)
+				$(".number").val("").focus();
 				var d = $(this).parent().parent();
 				var id=d.attr('data'),packagenum=d.attr('packagenum'),maxCount=d.attr('maxCount');
 				$(".number").attr("data",id);
@@ -243,28 +244,26 @@ $(document).ready(function(){
 			$(".mask_right").on("click",function(){
 				$(".input_mask").hide()
 				var a = $(this).parents().siblings(".number").attr("data");
-				var b = $(this).parents().siblings(".number").attr("packagenum");
 				var c = $(this).parents().siblings(".number").attr("val");
-				var d = $(this).parents().siblings(".number").attr("maxCount");
 				var e = JSON.parse(localStorage.good);
 				if(e.length != 1){
 					if(c == 0){
-						$('span[dataID='+a+']').addClass("hidden")
-						$('span[dataID='+a+']').prev().addClass("hidden")
+						$('span[dataID='+a+']').addClass("hidden").prev().addClass("hidden")
 						$('li[data = '+ a +']').remove();
 						var goodobj = JSON.parse(localStorage.good);
 						for (var i in goodobj) {
 					       	if (goodobj[i].id == a) {
-					       			goodobj.splice(i,1)
-					            	localStorage.good = JSON.stringify(goodobj, memberfilter);
-					       		}
+				       			goodobj.splice(i,1)
+				            	localStorage.good = JSON.stringify(goodobj, memberfilter);
+				            	return ;
+				       		}
 			    		}
 						$("#gw_car").animate({
-						bottom:($('.footer_car').height()+97)+"px"
+							bottom:($('.footer_car').height()+97)+"px"
 						},300)
 					}else{
 						$('span[dataID='+a+']').html(c)
-						pub.eventHeadle.del(a,c)
+						pub.eventHeadle.change_num(a,c)
 					}
 				}else{
 					if(c == 0){
@@ -280,7 +279,7 @@ $(document).ready(function(){
 						pub.style_change()
 					}else{
 						$('span[dataID='+a+']').html(c)
-						pub.eventHeadle.del(a,c)
+						pub.eventHeadle.change_num(a,c)
 					}
 			 	}
 			})
@@ -305,14 +304,15 @@ $(document).ready(function(){
 				}
        	 	})
 		},
-		del :function(a,b){
+		change_num :function(a,b){
 			var goodobj = JSON.parse(localStorage.good);
-						for (var i in goodobj) {
-					       	if (goodobj[i].id == a) {
-					       			goodobj[i].sum = b ;
-					            	localStorage.good = JSON.stringify(goodobj, memberfilter);
-					       		}
-			    		}
+			for (var i in goodobj) {
+		       	if (goodobj[i].id == a) {
+	       			goodobj[i].sum = b ;
+	            	localStorage.good = JSON.stringify(goodobj, memberfilter);
+	            	return ;
+	       		}
+    		}
 		}
 	}
 /*-------------------------更多商品------------------------------*/

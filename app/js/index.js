@@ -136,7 +136,7 @@ $(document).ready(function(){
 			var v2 = data.data.centerList;
 			if (v2.length != 0) {
 				var linkUrl1 = pub.index.getLinkUrl(v2[0].jumpType , v2[0].linkUrl , v2[0].adTime);
-				var html1 = '<a href="'+(!linkUrl1 ? "html/online_coupon.html" : linkUrl1)+'"><img src="'+v2[0].adLogo+'" /></a>'
+				var html1 = '<a href="'+(!linkUrl1 ? "javascript:void(0)" : linkUrl1)+'"><img src="'+v2[0].adLogo+'" /></a>'
 				$(".index-advertisement-wrap .index-advertisement").html(html1).css("display","block");
 			}
 			
@@ -310,6 +310,8 @@ $(document).ready(function(){
 					return pub.add + "goodsDetails.html?goodsId="+code;
 				}else if (type == 3) {
 					return pub.add + "details.html?linUrl="+code + "&title="+tit;
+				}else if(type == 4){
+					return pub.add + "online_coupon.html";
 				}
 			}
 			return null;
