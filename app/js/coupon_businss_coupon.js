@@ -13,7 +13,8 @@ $(document).ready(function(){
 		method:{//1.商家信息2.更改密码3.优惠卷
 			"1":['firm_info_show',"firm_info_update"],
 			"2":['user_update_pwd'],
-			"3":['coupon_info_show']
+			"3":['coupon_info_show'],
+			"4":['online_coupon_list','get_coupon']
 		},
 		data:{
 			isMain:{"1":"主账号：","2":"副账号："},
@@ -242,6 +243,80 @@ $(document).ready(function(){
 			})
 		}
 	}
+	/*=============================在线领取优惠卷===============================*/
+	pub.online_coupon = {
+		init:function(){
+			pub.online_coupon.api();
+			pub.online_coupon.eventHeadle.init();
+		},
+		api:function(){
+			common.ajaxPost($.extend(pub.publicParameter,{
+				method:pub.method[pub.type][pub.index],
+				websiteNode:pub.websiteNode,
+				pageNum:0,
+				pageSize:5,
+				firmId:pub.firmId
+			}),function(data){
+				if (data.statusCode == "100000") {
+					pub.online_coupon.show(data)
+				}
+			})
+		},
+		show:function(data){
+			var html='',
+				v = data.data.list;
+			for (var i in v) {
+				if(v[i].onOff){
+					html+='<dl class="clearfloat coupon_status1" data = "'+v[i].id+'">'
+					html+='	<dt class="sprite_login online_coupon quan_c">'+v[i].mouldMoney+'元</dt>'
+				}else{
+					html+='<dl class="clearfloat coupon_status3" data = "'+v[i].id+'">'
+					html+='	<dt class="sprite_login online_coupon quan_a">'+v[i].mouldMoney+'元</dt>'
+				}
+	    		
+	    		html+='	<dd>'
+	    		html+='		<div class="coupon_top clearfloat">'
+	    		html+='			<div class="coupon_name">'+v[i].mouldName+'</div>'
+    			html+='		</div>'
+	    		html+='		<div class="coupon_time">有效期：'+v[i].realDays+'天</div>'
+	    		html+='		<div class="coupon_money">金额要求：'+v[i].leastOrderMoney+'元</div>'
+	    		html+='		<div class="coupon_come">来源：在线领取优惠券</div>'
+	    		html+='	</dd>'
+	    		if(v[i].onOff){
+	    			html+='	<dd class="receive_state">领券</dd>'
+	    		}else{
+	    			html+='	<dd class="receive_state">已领取</dd>'
+	    		}
+	    		html+='</dl>'		    		
+			}
+			$('.coupon_main_').append(html)
+		},
+		 state :function(id){
+		 	common.ajaxPost($.extend(pub.publicParameter,{
+				method:'get_coupon',
+				couponId:id,
+				firmId:pub.firmId
+			}),function(data){
+				if (data.statusCode=='100000') {
+					common.prompt('领取成功')
+				}else{
+					common.prompt(data.statusStr);
+				}
+			})
+		 }
+	}
+	pub.online_coupon.eventHeadle = {
+		init:function(){
+			$(".coupon_main_").on("click",".receive_state",function(){
+				var id = $(this).parents("dl").attr("data")
+				$(this).text("已领取");
+				$(this).parents("dl").removeClass("coupon_status1").addClass("coupon_status3");
+				$(this).siblings("dt").removeClass("quan_c").addClass("quan_a");
+				pub.online_coupon.state(id);
+			})
+		}
+	}
+	
 	pub.init = function(){
 		pub.eventHeadle.init();
 		pub.type = $("body").attr("data");
@@ -253,6 +328,8 @@ $(document).ready(function(){
 		}else if (pub.type == 3) {
 			pub.code = common.websiteNode+'#YHQ-DESC';
 			pub.coupon.init();
+		}else{
+			pub.online_coupon.init();
 		}
 		
 	}

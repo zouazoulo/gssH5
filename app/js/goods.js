@@ -140,7 +140,7 @@ $(document).ready(function(){
 				//var goodType = d.attr('goodType');
 				//var goodscore = d.attr('score');
 				//console.log(parseInt($(this).siblings().eq(1).text()) +"&&"+ packagenum)
-				if (parseInt($(this).siblings().eq(1).text()) < parseInt(packagenum)) {
+				if (parseInt($(this).siblings().eq(1).text()) < parseInt(packagenum)) {	
 					if(maxCount >0){
 						if(parseInt($(this).siblings().eq(1).text())<maxCount){
 							var num=addgoods(id)
@@ -222,6 +222,97 @@ $(document).ready(function(){
 				common.jsadd();
 			});
 			common.fadeIn()
+			
+			//添加点击弹出输入框事件
+			$(".car_main ul").on("click",".car_number",function(){
+				var a = $(this).text()
+				$(".input_mask p").text("")
+				$(".input_mask").show()
+				$(".number").val(a)
+				var d = $(this).parent().parent();
+				var id=d.attr('data'),packagenum=d.attr('packagenum'),maxCount=d.attr('maxCount');
+				$(".number").attr("data",id);
+				$(".number").attr("packagenum",packagenum)
+				$(".number").attr("maxCount",maxCount)
+			})
+			
+			$(".mask_left").on("click",function(){
+				$(".input_mask").hide()
+				
+			})
+			$(".mask_right").on("click",function(){
+				$(".input_mask").hide()
+				var a = $(this).parents().siblings(".number").attr("data");
+				var b = $(this).parents().siblings(".number").attr("packagenum");
+				var c = $(this).parents().siblings(".number").attr("val");
+				var d = $(this).parents().siblings(".number").attr("maxCount");
+				var e = JSON.parse(localStorage.good);
+				if(e.length != 1){
+					if(c == 0){
+						$('span[dataID='+a+']').addClass("hidden")
+						$('span[dataID='+a+']').prev().addClass("hidden")
+						$('li[data = '+ a +']').remove();
+						var goodobj = JSON.parse(localStorage.good);
+						for (var i in goodobj) {
+					       	if (goodobj[i].id == a) {
+					       			goodobj.splice(i,1)
+					            	localStorage.good = JSON.stringify(goodobj, memberfilter);
+					       		}
+			    		}
+						$("#gw_car").animate({
+						bottom:($('.footer_car').height()+97)+"px"
+						},300)
+					}else{
+						$('span[dataID='+a+']').html(c)
+						pub.eventHeadle.del(a,c)
+					}
+				}else{
+					if(c == 0){
+						var id=$(this).parents().find("li[data]").attr('data');
+						$('span[dataID]').html(0)
+						$('.footer_car').addClass("hidden").find(".car_main ul li").remove();
+						$(".my_bg").addClass("hidden");
+						localStorage.removeItem('good');
+						$('#gw_car').addClass("hidden").css('bottom','26px')
+						$('.footer-left').addClass("sprite icon_shoppingcar").html("购物车是空的").animate({
+							'text-indent':0
+						},300)
+						pub.style_change()
+					}else{
+						$('span[dataID='+a+']').html(c)
+						pub.eventHeadle.del(a,c)
+					}
+			 	}
+			})
+			//验证是否是数字
+			$(".number").on("input propertychange",function(){ //input propertychange 即时监听事件
+        		$(this).val($(this).val().replace(/\D/g,"")) //将非数字替换成空字符串
+        		var d = $(this);
+        		
+        		var id=d.attr('data'),packagenum=d.attr('packagenum'),maxCount=d.attr('maxCount');
+        		if ($(this).val() < parseInt(packagenum)) {
+        			d.attr("val",d.val());
+        			$(".input_mask p").text("")
+					if(maxCount >0){
+						if($(this).val() > maxCount){
+							$(".input_mask p").text("该商品限购"+maxCount+"件")
+							d.attr("val",maxCount);
+						}
+					}
+				} else{
+					d.attr("val",packagenum);
+					$(".input_mask p").text("*库存不足*")
+				}
+       	 	})
+		},
+		del :function(a,b){
+			var goodobj = JSON.parse(localStorage.good);
+						for (var i in goodobj) {
+					       	if (goodobj[i].id == a) {
+					       			goodobj[i].sum = b ;
+					            	localStorage.good = JSON.stringify(goodobj, memberfilter);
+					       		}
+			    		}
 		}
 	}
 /*-------------------------更多商品------------------------------*/
@@ -439,7 +530,6 @@ $(document).ready(function(){
 			//点击商品增加
 			$('.moreGoods_box_list').on('click','.goodsNumber_max',function(e){
 				var ele = $(this).parents().find('dl[data]');
-				console.log(ele.attr('data'))
 				var id=ele.attr('data'),name=ele.attr('dataName'),price=ele.attr('dataPir'),
 				wholePriceSize=ele.attr('wholePriceSize'),
 				gssPrice=ele.attr('gssPrice'),

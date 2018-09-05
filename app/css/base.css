@@ -1452,3 +1452,93 @@ body .layui-m-layer .layui-m-layer-msg{width:auto;max-width:90%;margin:0 auto;bo
 .conpon_item_box .order_details_coupon{width: 100%;}
 .conpon_item_box .order_details_coupon dd{float: right;min-width: 100px;background: url(../img/arrow_right.png) no-repeat right center;padding-right: 44px;height: 80px;position: relative;right: -20px;color: #f50909;}
 .order_details_coupon_box11{color: #f50909;}
+/*2018.9.3*/
+/*在线领取优惠券*/
+.coupon_main_ .clearfloat {position: relative;}
+.coupon_main_wrap dl{border-radius: 10px;}
+.coupon_status1 .receive_state{color:#f76b0f; border:1px solid #f76b0f;}
+.coupon_status2 .receive_state{color:#e3b17a;border:1px solid #e3b17a;}
+.coupon_status3 .receive_state{color:#666;border:1px solid #666;}
+.coupon_main_  .clearfloat  .receive_state {
+	position: absolute;
+	right:20px;
+	top:0;
+	bottom: 0;
+	margin: auto;
+	width:initial;
+	height: 60px;
+    font-size: 26px;
+    padding: 10px 26px;
+    border-radius: 26px;
+    letter-spacing: 2px;
+    box-sizing: border-box;
+    }
+.coupon_main_ .clearfloat dd div + div{
+    	color:#999;
+    }
+/*数量改为点击输入框*/
+.car_number {
+    width: 100px;
+    text-align: center;
+ }
+.input_mask{
+	position: absolute;
+	width: 100%;
+	height:100%;
+	top:0;
+	bottom: 0;
+	right: 0;
+	left: 0;
+	margin: auto;
+	z-index:999;
+	background-color: rgba(0,0,0,.5);
+	font-size: 32px;
+}
+.input_mask .wrap{
+	position: absolute;
+	width:490px;
+	height:214px;
+	top:0;
+	bottom: 0;
+	right: 0;
+	left: 0;
+	margin: auto;
+	padding: 30px 10px;
+	background-color: #fff;
+	border-radius: 10px;
+}
+.input_mask .wrap input{
+	width: 100%;
+	height:50px;
+	border:1px solid #000;
+	
+}
+.input_mask .wrap p {
+	height:35px;
+	font-size: 26px;
+	color:red;
+} 
+.input_mask .wrap .mask_left ,
+.input_mask .wrap .mask_right{
+	display: inline-block;
+    width: 130px;
+    margin: 16px 44px 0;
+    border-radius: 4px;
+    height: 56px;
+    line-height: 56px;
+    font-size: 30px;
+    text-align: center;
+}
+.input_mask .wrap .mask_left{
+	float: left;
+	background-color: #ddd;
+}
+.input_mask .wrap .mask_right{
+	float:right;
+	background-color: #f76b0f;
+    color: #fff;
+}
+/*首页公告轮播*/
+.gonggao-wrap.sprite{
+	background-color: #FFFFFF;
+}
