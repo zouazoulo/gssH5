@@ -119,6 +119,7 @@
 						pub.html +='</div>'
 					};
 					$(".main.message .message_box").append(pub.html);
+					console.log(pub.isLast)
 					if (pub.isLast) {
 						$(".lodemore").html("没有更多数据了！");
 					}else{
@@ -133,7 +134,9 @@
 					$(".score_message_box").on('click','.message_button',function(){
 						pub.message.exchangeapi($(this).attr("data"))
 					});
+					
 					$('.lodemore').on('click',function(){
+						console.log(pub.isLast)
 						if (!pub.isLast) {
 							pub.pageNo ++ ;
 							pub.message.api();

@@ -243,15 +243,15 @@ var common={
 		}
 	},
 	txq:function(obj,good_sta){
-		obj.on("click",function(){
-			var goodsId=$(this).attr("data");
+		
+			var goodsId=obj;
 			sessionStorage.setItem("goodsId",goodsId);
 			if (good_sta == 1) {
 				window.location.href="html/goodsDetails.html?v=0.1"
 			}else{
 				window.location.href="goodsDetails.html?v=0.1";
 			}
-		})
+		
 	},
 	/*点击选好了按钮请求成功的回调函数*/
 	settlement_cart:function(goodsList,firmId,sign,source,sta){

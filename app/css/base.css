@@ -1481,7 +1481,7 @@ body .layui-m-layer .layui-m-layer-msg{width:auto;max-width:90%;margin:0 auto;bo
     width: 100px;
     text-align: center;
  }
-.input_mask{
+.input_mask .mask_input{
 	position: absolute;
 	width: 100%;
 	height:100%;
@@ -1490,9 +1490,9 @@ body .layui-m-layer .layui-m-layer-msg{width:auto;max-width:90%;margin:0 auto;bo
 	right: 0;
 	left: 0;
 	margin: auto;
-	z-index:999;
+	z-index:99;
 	background-color: rgba(0,0,0,.5);
-	font-size: 32px;
+	
 }
 .input_mask .wrap{
 	position: absolute;
@@ -1506,6 +1506,8 @@ body .layui-m-layer .layui-m-layer-msg{width:auto;max-width:90%;margin:0 auto;bo
 	padding: 30px;
 	background-color: #fff;
 	border-radius: 10px;
+	font-size: 32px;
+	z-index:999;
 }
 .input_mask .wrap input{
 	width: 100%;
@@ -1542,4 +1544,42 @@ body .layui-m-layer .layui-m-layer-msg{width:auto;max-width:90%;margin:0 auto;bo
 /*首页公告轮播*/
 .gonggao-wrap.sprite{
 	background-color: #FFFFFF;
+}
+/*Vue样式*/
+.login_main_top .active{
+	background: #FFFFFF;
+    color: #000000;
+}
+.login_btn {
+	background-color: #999;
+	margin-top:120px;
+	
+}
+.login_btn.active{
+	background-color:#f37c30;
+}
+.logistic_show{
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	margin-left: -300px;
+	margin-top: -345px;
+	width: 600px;
+	height: 690px;
+	z-index: 9999999;
+	background: #FFFFFF;
+	border-radius: 10px;
+}
+.logistic_show_text{
+	color:#000000;
+}
+.login_main_content .tips{
+	background-color: #fff;
+	color: red;
+}
+.apply_service_main input{
+	width:50%;
+}
+.apply_service_main .msg{
+	color: red ;
 }

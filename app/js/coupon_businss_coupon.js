@@ -23,6 +23,9 @@ $(document).ready(function(){
 			coupon : ['',"quan_c","quan_b","quan_a"]
 		},
 		code:null,
+		pageNum:common.pageNo,
+		pageSize:common.pageSize,
+		isReceive:true
 	})
 	//ajax公用参数
 	pub.publicParameter = {
@@ -150,7 +153,6 @@ $(document).ready(function(){
 		new_pass:null,
 		confirm_pass:null
 	})
-	
 	pub.change_password = {
 		init:function(){
 			$('.zhanghao input').val(pub.linkTel);
@@ -206,10 +208,12 @@ $(document).ready(function(){
 		},
 		api:function(){
 			common.ajaxPost($.extend(pub.publicParameter,{
-				method:pub.method[pub.type][pub.index],
+				method:pub.method[pub.type][pub.index]
 			}),function(data){
 				if (data.statusCode == "100000") {
 					pub.coupon.show(data)
+				}else{
+					common.prompt(data.statusStr);
 				}
 			})
 		},
@@ -247,18 +251,21 @@ $(document).ready(function(){
 	pub.online_coupon = {
 		init:function(){
 			pub.online_coupon.api();
-			pub.online_coupon.eventHeadle.init();
+			pub.online_coupon.eventHeadle.init()
 		},
 		api:function(){
-			common.ajaxPost($.extend(pub.publicParameter,{
+			common.ajaxPost({
 				method:pub.method[pub.type][pub.index],
 				websiteNode:pub.websiteNode,
-				pageNum:0,
-				pageSize:5,
+				pageNum: pub.pageNum ,
+				pageSize:pub.pageSize,
 				firmId:pub.firmId
-			}),function(data){
+			},function(data){
 				if (data.statusCode == "100000") {
+					pub.lastPage = data.data.lastPage
 					pub.online_coupon.show(data)
+				}else{
+					common.prompt(data.statusStr);
 				}
 			})
 		},
@@ -283,37 +290,57 @@ $(document).ready(function(){
 	    		html+='		<div class="coupon_come">来源：在线领取优惠券</div>'
 	    		html+='	</dd>'
 	    		if(v[i].onOff){
-	    			html+='	<dd class="receive_state">领券</dd>'
+	    			html+='	<dd class="receive_state" data = '+v[i].onOff+'>领券</dd>'
 	    		}else{
-	    			html+='	<dd class="receive_state">已领取</dd>'
+	    			html+='	<dd class="receive_state" data = '+v[i].onOff+' >已领取</dd>'
 	    		}
 	    		html+='</dl>'		    		
 			}
+			
 			$('.coupon_main_').append(html)
+			if (pub.lastPage) {
+						$(".lodemore").html("没有更多数据了！");
+					}else{
+						$(".lodemore").html("点击加载更多！");
+					}
 		},
 		 state :function(id){
-		 	common.ajaxPost($.extend(pub.publicParameter,{
+		 	common.ajaxPost({
 				method:'get_coupon',
 				couponId:id,
 				firmId:pub.firmId
-			}),function(data){
-				if (data.statusCode=='100000') {
-					common.prompt('领取成功')
-				}else{
+			},function(data){
+				if (data.statusCode !='100000') {
 					common.prompt(data.statusStr);
+				}else{
+					var  dom = $(".coupon_main_").find("dl[data="+id+"]");
+					console.log(dom.find("dd.receive_state").attr("data"))
+//					if(dom.find("dd.receive_state").attr("data")){
+						dom.removeClass("coupon_status1").addClass("coupon_status3");
+						dom.find('dt').removeClass("quan_c").addClass("quan_a");
+						dom.find("dd.receive_state").html("已领取")
+						common.prompt("已领取");
+//					}else{
+//						
+//					}
 				}
 			})
 		 }
 	}
 	pub.online_coupon.eventHeadle = {
 		init:function(){
-			$(".coupon_main_").on("click",".receive_state",function(){
-				var id = $(this).parents("dl").attr("data")
-				$(this).text("已领取");
-				$(this).parents("dl").removeClass("coupon_status1").addClass("coupon_status3");
-				$(this).siblings("dt").removeClass("quan_c").addClass("quan_a");
-				pub.online_coupon.state(id);
-			})
+			
+				$(".coupon_main_").on("click",".receive_state",function(){
+					var id = $(this).parents("dl").attr("data")
+					pub.online_coupon.state(id);
+				})
+			
+			$('.lodemore').on('click',function(){
+						if (!pub.lastPage) {
+							pub.pageNum ++ ;
+							pub.online_coupon.api();
+						}
+					});
 		}
 	}
 	
@@ -328,7 +355,7 @@ $(document).ready(function(){
 		}else if (pub.type == 3) {
 			pub.code = common.websiteNode+'#YHQ-DESC';
 			pub.coupon.init();
-		}else{
+		}else{	
 			pub.online_coupon.init();
 		}
 		
