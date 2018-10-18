@@ -23,9 +23,7 @@ $(document).ready(function(){
 			coupon : ['',"quan_c","quan_b","quan_a"]
 		},
 		code:null,
-		pageNum:common.pageNo,
-		pageSize:common.pageSize,
-		isReceive:true
+		textList:['','单笔订单实付满','单品订单实付满','单类订单实付满']
 	})
 	//ajax公用参数
 	pub.publicParameter = {
@@ -34,6 +32,12 @@ $(document).ready(function(){
 		tokenId:pub.tokenId,
 		sign:pub.sign,
 		source:pub.source
+	}
+	pub.pageNo = common.pageNo;
+	pub.pageSize =common.pageSize ;
+	
+	if (!common.getIslogin()) {
+		common.jump("login.html");
 	}
 	//公用弹出框接口
 	pub.desc_data = function(code){
@@ -85,7 +89,7 @@ $(document).ready(function(){
 			var v = data.data;
 			$('#business_shop_name').val(v.firmName);
 			$('#business_shop_id').val('NO.'+v.id);
-			$('#business_shop_score').val(v.score);
+			$('#business_shop_score').val(v.exp);
 			$('#business_shop_grade').val(v.userGrade);
 			$('#business_shop_address').val(v.address);
 			$('#business_shop_card').val(v.saleCard);
@@ -153,6 +157,7 @@ $(document).ready(function(){
 		new_pass:null,
 		confirm_pass:null
 	})
+	
 	pub.change_password = {
 		init:function(){
 			$('.zhanghao input').val(pub.linkTel);
@@ -208,12 +213,10 @@ $(document).ready(function(){
 		},
 		api:function(){
 			common.ajaxPost($.extend(pub.publicParameter,{
-				method:pub.method[pub.type][pub.index]
+				method:pub.method[pub.type][pub.index],
 			}),function(data){
 				if (data.statusCode == "100000") {
 					pub.coupon.show(data)
-				}else{
-					common.prompt(data.statusStr);
 				}
 			})
 		},
@@ -228,7 +231,7 @@ $(document).ready(function(){
     			html+='			<div class="coupon_state"></div>'
     			html+='		</div>'
 	    		html+='		<div class="coupon_time">有效期至：'+data.data[i].endTime+'</div>'
-	    		html+='		<div class="coupon_money">金额要求：单个订单大于'+data.data[i].leastOrderMoney+'元</div>'
+	    		html+='		<div class="coupon_money">金额要求：'+pub.textList[data.data[i].type]+data.data[i].leastOrderMoney+'元</div>'
 	    		html+='		<div class="coupon_come">来源：'+data.data[i].sendMethod+'</div>'
 	    		html+='	</dd>'
 	    		html+='</dl>'		    		
@@ -251,27 +254,26 @@ $(document).ready(function(){
 	pub.online_coupon = {
 		init:function(){
 			pub.online_coupon.api();
-			pub.online_coupon.eventHeadle.init()
+			pub.online_coupon.eventHeadle.init();
 		},
 		api:function(){
-			common.ajaxPost({
+			common.ajaxPost($.extend({},pub.publicParameter,{
 				method:pub.method[pub.type][pub.index],
 				websiteNode:pub.websiteNode,
-				pageNum: pub.pageNum ,
+				pageNum:pub.pageNo,
 				pageSize:pub.pageSize,
-				firmId:pub.firmId
-			},function(data){
+			}),function(data){
 				if (data.statusCode == "100000") {
-					pub.lastPage = data.data.lastPage
 					pub.online_coupon.show(data)
-				}else{
-					common.prompt(data.statusStr);
 				}
 			})
 		},
 		show:function(data){
 			var html='',
 				v = data.data.list;
+				pub.isLast = data.data.lastPage;
+				pub.isLast && $('.lodemore').html('没有更多数据了');
+				!pub.isLast && $('.lodemore').html('点击加载更多数据');
 			for (var i in v) {
 				if(v[i].onOff){
 					html+='<dl class="clearfloat coupon_status1" data = "'+v[i].id+'">'
@@ -286,61 +288,48 @@ $(document).ready(function(){
 	    		html+='			<div class="coupon_name">'+v[i].mouldName+'</div>'
     			html+='		</div>'
 	    		html+='		<div class="coupon_time">有效期：'+v[i].realDays+'天</div>'
-	    		html+='		<div class="coupon_money">金额要求：'+v[i].leastOrderMoney+'元</div>'
+	    		html+='		<div class="coupon_money">实付金额满：'+v[i].leastOrderMoney+'元</div>'
 	    		html+='		<div class="coupon_come">来源：在线领取优惠券</div>'
 	    		html+='	</dd>'
 	    		if(v[i].onOff){
-	    			html+='	<dd class="receive_state" data = '+v[i].onOff+'>领券</dd>'
+	    			html+='	<dd class="receive_state">领券</dd>'
 	    		}else{
-	    			html+='	<dd class="receive_state" data = '+v[i].onOff+' >已领取</dd>'
+	    			html+='	<dd class="receive_state">已领取</dd>'
 	    		}
 	    		html+='</dl>'		    		
 			}
-			
 			$('.coupon_main_').append(html)
-			if (pub.lastPage) {
-						$(".lodemore").html("没有更多数据了！");
-					}else{
-						$(".lodemore").html("点击加载更多！");
-					}
 		},
 		 state :function(id){
-		 	common.ajaxPost({
+		 	common.ajaxPost($.extend({},pub.publicParameter,{
 				method:'get_coupon',
-				couponId:id,
-				firmId:pub.firmId
-			},function(data){
-				if (data.statusCode !='100000') {
-					common.prompt(data.statusStr);
-				}else{
-					var  dom = $(".coupon_main_").find("dl[data="+id+"]");
-					console.log(dom.find("dd.receive_state").attr("data"))
-//					if(dom.find("dd.receive_state").attr("data")){
+				couponId:id
+			}),function(data){
+				if (data.statusCode=='100000') {
+					var dom = $(".coupon_main_").find("dl[data="+id+"]");
 						dom.removeClass("coupon_status1").addClass("coupon_status3");
 						dom.find('dt').removeClass("quan_c").addClass("quan_a");
 						dom.find("dd.receive_state").html("已领取")
-						common.prompt("已领取");
-//					}else{
-//						
-//					}
+		
+					common.prompt('领取成功')
+				}else{
+					common.prompt(data.statusStr);
 				}
 			})
 		 }
 	}
 	pub.online_coupon.eventHeadle = {
 		init:function(){
-			
-				$(".coupon_main_").on("click",".receive_state",function(){
-					var id = $(this).parents("dl").attr("data")
-					pub.online_coupon.state(id);
-				})
-			
+			$(".coupon_main_").on("click",".receive_state",function(){
+				var id = $(this).parents("dl").attr("data")
+				pub.online_coupon.state(id);
+			});
 			$('.lodemore').on('click',function(){
-						if (!pub.lastPage) {
-							pub.pageNum ++ ;
-							pub.online_coupon.api();
-						}
-					});
+				if (!pub.isLast) {
+					pub.pageNo++;
+					pub.online_coupon.api()
+				}
+			});
 		}
 	}
 	
@@ -355,7 +344,7 @@ $(document).ready(function(){
 		}else if (pub.type == 3) {
 			pub.code = common.websiteNode+'#YHQ-DESC';
 			pub.coupon.init();
-		}else{	
+		}else{
 			pub.online_coupon.init();
 		}
 		

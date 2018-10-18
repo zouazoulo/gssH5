@@ -46,9 +46,6 @@ window.LArea1 = (function() {
             var _self = this;
             //呼出插件
             function popupArea(e) {
-            	//添加判断是否选择省市
-              var a = document.getElementById("province")
-              if(a.value.length != 0){
                 _self.gearArea = document.createElement("div");
                 _self.gearArea.className = "gearArea";
                 _self.gearArea.innerHTML = 
@@ -103,7 +100,6 @@ window.LArea1 = (function() {
                 area_province.addEventListener('touchend', gearTouchEnd);
                 area_city.addEventListener('touchend', gearTouchEnd);
                 //area_county.addEventListener('touchend', gearTouchEnd);
-               }
             };
             //初始化插件默认值
             function areaCtrlInit() {
@@ -238,8 +234,7 @@ window.LArea1 = (function() {
                 }
             };
             _self.getData(function() {
-            	
-                	_self.trigger.addEventListener('click', popupArea )
+                _self.trigger.addEventListener('click', popupArea )
             });
         },
         //重置节点个数
@@ -306,7 +301,6 @@ window.LArea1 = (function() {
             var provinceText = area_province.childNodes[provinceVal].textContent;
             var provinceCode = area_province.childNodes[provinceVal].getAttribute('ref');
             var cityVal = parseInt(area_city.getAttribute("val"));
-            console.log(cityVal)
             var cityText = area_city.childNodes[cityVal].textContent;
             var cityCode = area_city.childNodes[cityVal].getAttribute('ref');
             //var countyVal = parseInt(area_county.getAttribute("val"));
@@ -318,7 +312,6 @@ window.LArea1 = (function() {
                 this.valueTo.value= provinceCode +((cityCode)?(',' + cityCode):(''));
             };
             _self.close(e);
-         	 document.getElementsByClassName("my_bg")[0].style.visibility="hidden";//隐藏遮罩
         },
         //点击取消
         close: function(e) {
@@ -328,8 +321,6 @@ window.LArea1 = (function() {
             _self.trigger.dispatchEvent(evt);
             document.body.removeChild(_self.gearArea);
             _self.gearArea=null;
-          document.getElementsByClassName("my_bg")[0].style.visibility="hidden";//隐藏遮罩
-           
         }
     };
     return MobileArea;

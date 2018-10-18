@@ -321,7 +321,6 @@ window.LArea = (function() {
                 this.valueTo.value= provinceCode +((cityCode)?(',' + cityCode):('')) + ((countyCode)?(',' + countyCode):(''));
             };
             _self.close(e);
-            document.getElementsByClassName("my_bg")[0].style.visibility="hidden"; //隐藏遮罩
         },
         //点击取消
         close: function(e) {
@@ -331,7 +330,6 @@ window.LArea = (function() {
             _self.trigger.dispatchEvent(evt);
             document.body.removeChild(_self.gearArea);
             _self.gearArea=null;
-            document.getElementsByClassName("my_bg")[0].style.visibility="hidden";//隐藏遮罩
         }
     };
     return MobileArea;

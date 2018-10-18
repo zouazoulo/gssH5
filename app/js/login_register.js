@@ -60,6 +60,27 @@ $(document).ready(function(){
 	pub.eventHeadle = {
 		init:function(){
 			common.callback($(".header_left"));
+			$(".apply_service_top_right,.login_bottom a").on('click',function(){
+				if (pub.destData) {
+					common.alert_show(pub.destData);
+				}else{
+					pub.code = "#HZ-DESC";
+					pub.desc_data()
+				}
+			});
+			/*
+			$("body").on("click",".logistic_back,.my_bg",function(){
+				alert(1);
+				$("#logistic_show,.my_bg").remove();
+			});*/
+			$('.login_main_content input,.apply_service_main input').on({
+				focus:function(){
+					$('.login_bottom').addClass("hidden");
+				},
+				blur:function(){
+					$('.login_bottom').removeClass("hidden");
+				}
+			});
 			$(window).load(function(){
 				common.jsadd();
 			});
@@ -71,7 +92,7 @@ $(document).ready(function(){
 	
 	pub.login = {
 		init:function(){
-//			pub.login.eventHeadle.init();
+			pub.login.eventHeadle.init();
 			pub.getcode && pub.login.get_openid();
 		},
 		login:function(){
@@ -93,8 +114,9 @@ $(document).ready(function(){
 				mobile:pub.phone	
 			},function(data){
 				if (data.statusCode == '100000') {
-					pub.login_Vue.isHidden = true;
-					pub.login_Vue.isTime = false
+					$("#verify_code").removeAttr("disabled")
+					$("#get_verify_code").addClass("hidden");
+					$("#time").removeClass("hidden").html('(60s后重试)')
 					pub.login.countDown()
 				}else{
 					common.prompt(data.statusStr)
@@ -104,11 +126,11 @@ $(document).ready(function(){
 		countDown:function(){
 			var id=setInterval(function(){
 				if (pub.i==0) {
-					pub.login_Vue.isTime = true;
-					pub.login_Vue.isHidden = false;
+					$("#time").addClass("hidden");
+					$("#get_verify_code").removeClass("hidden").html('重新获取');
 					clearInterval(id)
 				}else{
-					$("#time").html("("+pub.i+"s后可重试)");
+					$("#time").html("("+pub.i+"s后可重试)").css({"color":"#f76a10","background":"none"});
 				}
 				pub.i--; 
 			},1000)
@@ -151,137 +173,17 @@ $(document).ready(function(){
 			})
 		},
 	}
-	pub.login_Vue = new Vue({
-		el:"#login_register_Vue",
-		data:{
-			login : 0,
-			tipsMsg:null,
-			message:null,
-			account:null,
-			passWord:null,
-			code:null,
-			shopPhone:null,
-			phoneMsg:null,
-			city:null,
-			streetMsg:null,
-			isActive:false,
-			isHidden:false,
-			isTime:true,
-			bottomIsHidden:false,
-			mainHidden:false,
-			Hotline:JSON.parse(sessionStorage.getItem('system')).feedback_method,
-			
-		},
-		watch:{
-				login:function(val,oldval){
-					if(val == 0){
-						if(this.message != null && this.code != null){
-							 if( this.message.length == 11 && this.code.length == 6){
-							 	this.isActive = true;
-				            	if(!common.phoneNumberReg.test(this.message)){
-				            			this.tipsMsg = "请输入正确的手机号！"
-		            			}else{
-		            				this.tipsMsg  = null;
-		            			}
-		            		}
-		            	}else{
-		            		this.tipsMsg  = null;
-							this.isActive = false;
-		            	}
-					}else{
-							if(this.account != null && this.passWord !=null){
-								 if(this.account.length == 11 && this.passWord.length >= 6){
-								 	this.isActive = true;
-					             	if(!common.phoneNumberReg.test(this.account)){
-					            			this.tipsMsg = "请输入正确的手机号！"
-					            	}else{
-			            				this.tipsMsg  = null;
-			            			}
-			            		}
-			            	}else{
-			            		this.tipsMsg  = null;
-								this.isActive = false;
-			            	}
-					}
-				
-				},
-				message: function(val) {
-					var n = val.replace(/\D/g,"");
-		        	if (n == 0) {
-		            	this.message='';
-		            }else{
-		            	this.message=n;
-		            }
-		           if( this.message.length == 11){
-		            	if(!common.phoneNumberReg.test(this.message)){
-		            			this.tipsMsg = "请输入正确的手机号！"
-            			}else{
-            				this.tipsMsg  = null;
-            			}
-            		}else{
-            			this.tipsMsg  = null;
-            		}
-				},
-				account:function(val){
-					var n = val.replace(/\D/g,"");
-		        	if (n == 0) {
-		            	this.account='';
-		            }else{
-		            	this.account=n;
-		           }
-	             	if( this.account.length == 11){
-		             	if(!common.phoneNumberReg.test(this.account)){
-		            			this.tipsMsg = "请输入正确的手机号！"
-		            	}else{
-            				this.tipsMsg  = null;
-            			}
-            		}else{
-            			this.tipsMsg  = null;
-            		}
-					
-				},
-				passWord:function(){
-					if(this.account.length == 11 && this.passWord.length >= 6 ){
-						this.isActive = true;
-					}else{
-						this.isActive = false
-					}
-				},
-				code:function(val){
-					var n = val.replace(/\D/g,"");
-		            this.code = n;
-					if( this.message.length == 11 && this.code.length == 6 ){
-						this.isActive = true;
-					}else{
-						this.isActive = false
-					}
-				},
-				shopPhone:function(val){
-					var n = val.replace(/\D/g,"");
-		        	if (n == 0) {
-		            	this.shopPhone='';
-		            }else{
-		            	this.shopPhone=n;
-		            }
-	             	if( this.shopPhone.length == 11){
-		            	if(!common.phoneNumberReg.test(n)){
-	            			this.phoneMsg = "请输入正确的手机号！"
-	        			}else{
-	        				
-	        				this.phoneMsg  = null;
-	        			}
-            		}else{
-            			this.phoneMsg  = null;
-            		}
+	pub.login.eventHeadle = {
+		init:function(){
+			$(".login_main_top li").on("click",function(){
+				if ($(this).is(".tab_bg_color")) {
+					$(this).removeClass().addClass('tab_bg_color_sel').siblings().removeClass().addClass("tab_bg_color");
 				}
-				
-		},
-		methods:{
-			apply_service:function(){
-				window.location.href = "../html/apply_service.html"
-			},
-			login_btn:function(e){
-				var $sel = $(".login_main_content ul:visible") ;
+				$(".login_main_content ul").eq($(this).index()).removeClass("hidden").siblings().addClass("hidden")
+			});
+			//点击登陆
+			$(".login_btn").on("click",function(){
+				var $sel = $(".login_main_content ul:not(.hidden)");
 				pub.index = $sel.index();
 				pub.phone = $sel.find(".icon_phone input").val();
 				pub.passWord = $sel.find(".icon_password input").val();
@@ -291,14 +193,17 @@ $(document).ready(function(){
 				}else{
 					pub.parameter = {password:md5(pub.passWord)}
 				}
-				var target = event.target;
-		   		var isActive = $(target).is('.active');
-		   		 if (isActive) {
-		   				pub.login.login();
-		   		}
-				
-			},
-			get_verify_code:function(){
+				if (pub.phone == '') {
+					common.prompt(pub.msgArr[2]);
+				}else if (!common.phoneNumberReg.test(pub.phone)) {
+					common.prompt(pub.msgArr[3]);
+				}else if($sel.find(".sprite:not(.icon_phone) input").val() == ""){
+					common.prompt(pub.msgArr[$sel.index()])
+				}else{
+					pub.login.login();
+				}
+			});
+			$("#get_verify_code").on("click",function(){
 				pub.phone = $("#login_phoneNumber1").val();
 				if (pub.phone == '') {
 					common.prompt(pub.msgArr[2])
@@ -308,99 +213,24 @@ $(document).ready(function(){
 					pub.i = 59;
 					pub.login.getCode();
 				}
-			},
-			submit_btn:function(){
-				/*店铺名称*/
-					pub.firmName = $("#shopName").val();
-					/*联系电话*/
-					pub.linkTel = $("#shopPhone").val();
-					/*联系人*/
-					pub.linkMan = $("#shopPeople").val();
-					/*店铺地址*/
-					pub.address = $("#shopAddress").val();
-					//特别说明
-					pub.description = $("#shopText").val();
-					
-					var arr1 = $("#value1").val().split(",");
-					pub.province = arr1[0];
-					pub.city = arr1[1];
-					pub.county = arr1[2];
-					var arr2 = $("#value2").val().split(",");
-					pub.street = arr2[0];
-					pub.road = arr2[1];
-					
-					pub.recommend_id = $("#recommend_id").val();
-					pub.recommend_name = $("#recommend_name").val();
-					
-					if(pub.firmName == ''){
-						common.prompt(pub.msg[0]);
-					} else if (pub.address == '') {
-						common.prompt(pub.msg[1]);
-					} else if (pub.linkTel == '') {
-						common.prompt(pub.msg[2]);
-					} else if (pub.linkMan == '') {
-						common.prompt(pub.msg[3]);
-					} else if(!common.phoneNumberReg.test(pub.linkTel)){
-						common.prompt(pub.msg[4]);
-					}else{
-						pub.register.applyService()
-					}
-				},
-			province:function(){
-				var code = $("#value1").val().split(",").pop();
-				console.log(code)
-					if (code != "") {
-						pub.register.get_street(code);
-					}
-			},
-			img:function(){
-				if (pub.destData1) {
-						common.alert_show(pub.destData1)
-					}else{
-						pub.code = "#TJR-DESC";
-						pub.desc_data();
-					}
-			},
-			street:function(){
-					console.log(this.city)
-					if(this.city){
-						this.streetMsg=null
-						 document.getElementsByClassName("my_bg")[0].style.visibility="visible";
-					}else{
-						this.streetMsg ="请先选择省市！！"
-						
-					}
-			},
-			tips:function(){
-				if (pub.destData) {
-					common.alert_show(pub.destData);
-				}else{
-					pub.code = "#HZ-DESC";
-					pub.desc_data()
-				}
-			},
-			focus:function(){
-				this.bottomIsHidden = true;
-			},
-			blur:function(){
-				this.bottomIsHidden = false;
-			},
-			gearArea:function(){
-				 document.getElementsByClassName("my_bg")[0].style.visibility="visible";
-			}
+			});
+			$(window).load(function(){
+				common.jsadd()
+			});
 		}
-	})
+	}
+	
 	/*------------------------------------注册模块--------------------------------------------*/
 	pub.register = {
 		init:function(){
 			$("#sel_websit").val(common.websitData[pub.websiteNode]);
 			pub.register.api0();
-//			pub.register.eventHeadle.init();
+			pub.register.eventHeadle.init();
 			pub.area2 = new LArea1();
 			pub.register.streetInit();
 			console.log(common.isPc() == 2)
 			//if (common.isPc() == 2) {
-//				$('.login_bottom').css("position","relative");
+				$('.login_bottom').css("position","relative");
 			//}
 		},
 		api0:function(){
@@ -473,8 +303,12 @@ $(document).ready(function(){
 			});
 		},
 		apply_suc:function(){
-			pub.login_Vue.mainHidden = true;
-			pub.login_Vue.bottomIsHidden = true;
+			$('.apply_service_main').addClass("hidden");
+			$('.submit_btn').addClass("hidden");
+			$('.login_bottom').addClass("hidden");
+			$('.apply_suc').addClass("show");
+			$('.apply_suc dd p').eq(1).html('服务热线:'+JSON.parse(sessionStorage.getItem('system')).feedback_method);
+			$('.apply_suc dd a').attr('href','tel:'+JSON.parse(sessionStorage.getItem('system')).feedback_method);
 		},
 		streetInit:function(){
 			pub.area2.init({
@@ -490,6 +324,66 @@ $(document).ready(function(){
 			pub.area2.value=[0,0,0];//控制初始位置，注意：该方法并不会影响到input的value
 		}
 	}
+	pub.register.eventHeadle = {
+		init:function(){
+			$(".submit_btn").on("click",function(){
+				/*店铺名称*/
+				pub.firmName = $("#shopName").val();
+				/*联系电话*/
+				pub.linkTel = $("#shopPhone").val();
+				/*联系人*/
+				pub.linkMan = $("#shopPeople").val();
+				/*店铺地址*/
+				pub.address = $("#shopAddress").val();
+				//特别说明
+				pub.description = $("#shopText").val();
+				
+				var arr1 = $("#value1").val().split(",");
+				pub.province = arr1[0];
+				pub.city = arr1[1];
+				pub.county = arr1[2];
+				var arr2 = $("#value2").val().split(",");
+				pub.street = arr2[0];
+				pub.road = arr2[1];
+				
+				pub.recommend_id = $("#recommend_id").val();
+				pub.recommend_name = $("#recommend_name").val();
+				
+				if(pub.firmName == ''){
+					common.prompt(pub.msg[0]);
+				} else if (pub.address == '') {
+					common.prompt(pub.msg[1]);
+				} else if (pub.linkTel == '') {
+					common.prompt(pub.msg[2]);
+				} else if (pub.linkMan == '') {
+					common.prompt(pub.msg[3]);
+				} else if(!common.phoneNumberReg.test(pub.linkTel)){
+					common.prompt(pub.msg[4]);
+				}else{
+					pub.register.applyService()
+				}
+			});
+			$("#province").on("input propertychange",function(){
+				var code = $("#value1").val().split(",").pop();
+				if (code != "") {
+					pub.register.get_street(code);
+				}
+			});
+			$(".padding_right24 img").on("click",function(){
+				if (pub.destData1) {
+					common.alert_show(pub.destData1)
+				}else{
+					pub.code = "#TJR-DESC";
+					pub.desc_data();
+				}
+			})
+			$(window).load(function(){
+				common.jsadd()
+			});
+		}
+	}
+	
+	
 	pub.init = function(){
 		pub.eventHeadle.init();
 		if ($('body').attr('data') == 1) {

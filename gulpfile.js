@@ -62,7 +62,7 @@ gulp.task("clean",function(){
 gulp.task('html', function () {
 	var options = {
         removeComments: true,  //清除HTML注释
-        collapseWhitespace: true,  //压缩HTML
+        collapseWhitespace: false,  //压缩HTML
         collapseBooleanAttributes: true,  //省略布尔属性的值 <input checked="true"/> ==> <input checked />
         removeEmptyAttributes: true,  //删除所有空格作属性值 <input id="" /> ==> <input />
         removeScriptTypeAttributes: true,  //删除<script>的type="text/javascript"
@@ -72,7 +72,7 @@ gulp.task('html', function () {
     };
     return gulp.src('./app/**/*.html')
        .pipe(processhtml())
-       .pipe(htmlmin(options))
+       //.pipe(htmlmin(options))
        .pipe(gulp.dest('./dist/'));
 });
 gulp.task("css",function(){

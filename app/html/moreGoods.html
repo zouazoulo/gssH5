@@ -5,9 +5,10 @@
 		<meta name="viewport" content="width=750,user-scalable=no"/>
     	<meta content="telephone=no, address=no" name="format-detection" />
     	<link rel="icon" href="../img/gss.ico" type="image/x-icon">
+    	<meta http-equiv="Content-Security-Policy" content="script-src 'self' 'unsafe-inline' 'unsafe-eval' http://app.guoss.cn/gss_api/server/api.do http://61.164.113.187:8090/gssapi/server/api.do; style-src 'self' 'unsafe-inline' 'unsafe-eval'"/>
 		<!-- build:css ../css/common.css -->
 	    <link rel="stylesheet" type="text/css" href="../css/rest.css"/>
-	    <link rel="stylesheet" type="text/css" href="../css/base.css"/>
+	    <link rel="stylesheet" type="text/css" href="../css/base.css?v=0928"/>
 	    <!-- /build -->
 		<title>更多商品</title>
 	</head>
@@ -29,6 +30,7 @@
 					<li>时令精选</li>
 					<li>国际精品</li>
 					<li>进口水果</li>-->
+					<!--<li v-for="(item,index) in topNav"  :data-code="item.typeCode" v-text="item.typeName"></li>-->
 				</ul>
 			</div>
 			<div class="moreDoogs_main_box clearfloat">
@@ -39,6 +41,9 @@
 				</div>
 				<div class="moreDoogs_main_box_right">
 					<div class="moreDoogs_main_box_right_box">
+						<ul class="moreGoods_box_list_class">
+							
+						</ul>
 						<ul class="moreGoods_box_list">
 						
 						</ul>
@@ -81,21 +86,20 @@
 		<!--输入框添加-->
 		<div class="input_mask" style="display:none;" >
 			<div class="wrap">
-				<input  class="number" type="text"  maxlength="4"   placeholder="请输入数量"/>
+				<input  class="number" type="tel"  maxlength="4"   placeholder="请输入数量" pattern="[0-9]*"/>
 				<p></p>
 				<div class="clearfloat">
 					<span class="mask_left">取消</span><span class="mask_right">确定</span>
 				</div>
 				
 			</div>
-			<div class="mask_input">
-					
-				</div>
 		</div>
 	</body>
-	<script src="../quote/jquery-1.8.3.min.js" type="text/javascript" charset="utf-8"></script>
-	<script src="../quote/mdData.js" type="text/javascript" charset="utf-8"></script>
-	<script src="../js/common.js" type="text/javascript" charset="utf-8"></script>
-	<script src="../js/goshop_car.js" type="text/javascript" charset="utf-8"></script>
-	<script src="../js/goods.js" type="text/javascript" charset="utf-8"></script>
+	<script src="../quote/jquery-1.8.3.min.js?v=20180928" type="text/javascript" charset="utf-8"></script>
+	<script src="../quote/mdData.js?v=20180928" type="text/javascript" charset="utf-8"></script>
+	<!--<script src="../quote/vue.min.js?v=20180928" type="text/javascript" charset="utf-8"></script>-->
+	<script src="../js/common.js?v=20180928" type="text/javascript" charset="utf-8"></script>
+	<script src="../js/goshop_car.js?v=20180928" type="text/javascript" charset="utf-8"></script>
+	<!--<script src="../js/moreGoods.js?v=20180928" type="text/javascript" charset="utf-8"></script>-->
+	<script src="../js/goods.js?v=20180928" type="text/javascript" charset="utf-8"></script>
 </html>

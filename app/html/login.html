@@ -5,65 +5,64 @@
 		<meta name="viewport" content="width=750,user-scalable=no"/>
     	<meta content="telephone=no, address=no" name="format-detection" />
     	<link rel="icon" href="../img/gss.ico" type="image/x-icon">
+    	<meta http-equiv="Content-Security-Policy" content="script-src 'self' 'unsafe-inline' 'unsafe-eval' http://app.guoss.cn/gss_api/server/api.do http://61.164.113.187:8090/gssapi/server/api.do; style-src 'self' 'unsafe-inline' 'unsafe-eval'"/>
+		
 		<!-- build:css ../css/common.css -->
 	    <link rel="stylesheet" type="text/css" href="../css/rest.css"/>
 	    <link rel="stylesheet" type="text/css" href="../css/base.css"/>
 	    <!-- /build -->
 		<title>登陆注册</title>
 	</head>
-	<body data = "1" >
-		<div v-cloak id="login_register_Vue" >
-			<div  class="header-wrap">
-				<div class="header_left login_top_back sprite arrow_left_orange">
-					返回
-				</div>
-				<h1 class="index_tit header_tit">
-					登陆
-				</h1>
-				<div class="header_right login_top_right">
-					<a href="javascript:void(0)"  @click.stop="apply_service" v-text="'申请服务'"></a>
-				</div>
+	<body data = "1">
+		<div class="header-wrap">
+			<div class="header_left login_top_back sprite arrow_left_orange">
+				返回
 			</div>
-			<div class="empty"></div>
-			<div class="main-wrap login_main-wrap">
-				<div class="main">
-					<ul class="login_main_top">
-						<li class="tab_bg_color" @click="login=0" :class="{'active':login===0 }" v-text="'动态短信登陆'"></li>
-						<li class="tab_bg_color" @click="login=1" :class="{'active':login===1 }" v-text="'账号密码登陆'"></li>
-					</ul>
-					<div class="login_main_content">
-						<ul v-cloak class="msg_login" v-show="login===0"> 
-							<li class="sprite icon_phone">
-								<input type="text" id="login_phoneNumber1" value="" maxlength="11" placeholder="请输入您的手机号码" v-model="message" autocomplete="on" @focus="focus" @blur="blur"/>
-								<a id="get_verify_code" @click="get_verify_code" :class="{'hidden':isHidden}" v-html = "isHidden ? '重新获取' : '获取验证码'"></a>
-								<a id="time" :class="{'hidden':isTime}" v-html="!isTime && '60s后重试'" style="background: none; color: #F76A10;"></a>
-							</li>
-							<li class="sprite icon_key">
-								<input type="text" id="verify_code" name="" placeholder="请输入收到的验证码" maxlength="6" :disabled="isTime" autocomplete="off"  v-model="code" @focus="focus" @blur="blur" />
-							</li>
-						</ul>
-						<ul v-cloak class="count_login" v-show="login===1">
-							<li class="sprite icon_phone">
-								<input type="text" id="login_phoneNumber2" maxlength="11" value="" placeholder="请输入您的账号" autocomplete="on" v-model="account" @focus="focus" @blur="blur"/>
-							</li>
-							<li class="sprite icon_password">
-								<input type="password" id="login_password" name="" placeholder="请输入您的密码" autocomplete="off" v-model="passWord" @focus="focus" @blur="blur" />
-							</li>
-						</ul>
-						<div class="tips" v-show="tipsMsg" v-text="tipsMsg"></div>
-					</div>
-				</div>
-				<button class="login_btn" :class="{'active':isActive}"  @click="login_btn" v-text="'登陆'"></button>
-				<div class="login_bottom" :class="{'hidden':bottomIsHidden}">
-					说明：登陆/申请服务说明您已同意<a href="javascritp:void(0)">《果速送合作协议》</a>
-				</div>
+			<h1 class="index_tit header_tit">
+				登陆
+			</h1>
+			<div class="header_right login_top_right">
+				<a href="apply_service.html?v=0.1">申请服务</a>
 			</div>
 		</div>
+		<div class="empty"></div>
+		<div class="main-wrap login_main-wrap">
+			<div class="main">
+				<ul class="login_main_top">
+					<li class="tab_bg_color_sel">动态短信登陆</li>
+					<li class="tab_bg_color">账号密码登陆</li>
+				</ul>
+				<div class="login_main_content">
+					<ul class="msg_login">
+						<li class="sprite icon_phone">
+							<input type="text" id="login_phoneNumber1" value="" placeholder="请输入您的手机号码" autocomplete="on" />
+							<a id="get_verify_code">获取验证码</a>
+							<a id="time" class="hidden" style="background: none; color: #F76A10;"></a>
+						</li>
+						<li class="sprite icon_key">
+							<input type="text" id="verify_code" name="" placeholder="请输入收到的验证码" disabled="disabled" autocomplete="off" />
+						</li>
+					</ul>
+					<ul class="count_login hidden">
+						<li class="sprite icon_phone">
+							<input type="text" id="login_phoneNumber2" value="" placeholder="请输入您的账号" autocomplete="on"/>
+						</li>
+						<li class="sprite icon_password">
+							<input type="password" id="login_password" name="" placeholder="请输入您的密码" autocomplete="off"/>
+						</li>
+					</ul>
+				</div>
+			</div>
+			<button class="login_btn"  autocomplete="off">登陆</button>
+			<div class="login_bottom">
+				说明：登陆/申请服务说明您已同意<a href="javascritp:void(0)">《果速送合作协议》</a>
+			</div>
+		</div>
+		
 	</body>
 	<script src="../quote/jquery-1.8.3.min.js" type="text/javascript" charset="utf-8"></script>
 	<script src="../quote/mobile-util.js" type="text/javascript" charset="utf-8"></script>
 	<script src="../js/common.js" type="text/javascript" charset="utf-8"></script>
 	<script src="../quote/mdData.js" type="text/javascript" charset="utf-8"></script>
 	<script src="../js/login_register.js" type="text/javascript" charset="utf-8"></script>
-	<script src="../js/vue.js" type="text/javascript" charset="utf-8"></script>
 </html>

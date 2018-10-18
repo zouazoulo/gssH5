@@ -51,7 +51,12 @@ var common={
 		if ((url == "html/login.html" || url == "login.html") && common.isWeiXin() && !localStorage.getItem("openid")) {
 			window.location.href = "https://open.weixin.qq.com/connect/oauth2/authorize?appid="+common.appid[common.websiteNode]+"&redirect_uri="+common.httpData[common.websiteNode]+"&response_type=code&scope=snsapi_userinfo&state=gss&connect_redirect=1#wechat_redirect"
 		}else{
-			window.location.href = url+"?v=0.1";
+			if (url.indexOf("?") > 1) {
+				window.location.href = url+"&v=1009";
+			}else{
+				window.location.href = url+"?v=1009";
+			}
+			
 		}
 	},
 	getUrlParam:function  ( mid ) {
@@ -111,6 +116,12 @@ var common={
 	// 判断环境是否为微信
 	isWeiXin : function(){
 		return navigator.userAgent.toLowerCase().match(/MicroMessenger/i) == 'micromessenger';
+	},
+	// APP
+	isApp : function(){
+		var 
+		ua = navigator.userAgent.toLowerCase();
+		return ua.match(/gss_app/i) == 'gss_app';
 	},
 	height:function(){
 		return 
@@ -243,15 +254,15 @@ var common={
 		}
 	},
 	txq:function(obj,good_sta){
-		
-			var goodsId=obj;
+		obj.on("click",function(){
+			var goodsId=$(this).attr("data");
 			sessionStorage.setItem("goodsId",goodsId);
 			if (good_sta == 1) {
 				window.location.href="html/goodsDetails.html?v=0.1"
 			}else{
 				window.location.href="goodsDetails.html?v=0.1";
 			}
-		
+		})
 	},
 	/*点击选好了按钮请求成功的回调函数*/
 	settlement_cart:function(goodsList,firmId,sign,source,sta){

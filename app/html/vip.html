@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<meta name="viewport" content="width=750,user-scalable=no"/>
+    	<meta content="telephone=no, address=no" name="format-detection" />
+    	<link rel="icon" href="../img/gss.ico" type="image/x-icon">
+    	<!--<meta http-equiv="Content-Security-Policy" content="script-src 'self' 'unsafe-inline' 'unsafe-eval' http://app.guoss.cn/gss_api/server/api.do http://61.164.113.187:8090/gssapi/server/api.do; style-src 'self' 'unsafe-inline' 'unsafe-eval'"/>
+		-->
+		<link rel="stylesheet" href="../css/common-d166689713.css">
+		<title>VIP服务</title>
+	</head>
+	<body>
+		<div id="appVue">
+			<div v-cloak class="header-wrap" v-show="!isApp">
+				<div class="header_left login_top_back sprite arrow_left_orange">返回</div>
+				<h1 class="index_tit header_tit">VIP服务</h1>
+			</div>
+			<div v-cloak class="empty" v-show="!isApp"></div>
+			<div v-cloak class="main-wrap vip_main_wrap">
+				<div class="vip_main_top" v-show="userVipInfo.monthExp">
+					<div class="vip_main_growValue" >
+						<div class="vip_growValue_top">
+							<span class="vip_growValue_tit">当月成长值</span><span class="vip_growValue_desc" v-text="'当月成长值为'+userVipInfo.firmMonthExp+'点,再积'+userVipInfo.needExp+'点可享受下个月VIP服务'"></span>
+						</div>
+						<div class="vip_growValue_progress">
+							<p class="growInfo_progressAll"></p>
+							<p class="growInfo_progressTrue" v-bind:style="{width: getWidth+'px'}"></p>
+						</div>
+						<div class="vip_growValue_progress_subscript clearfloat">
+							<span class="float_left" v-text='0'></span>
+							<span class="float_right" v-text='userVipInfo.firmMonthExp > userVipInfo.monthExp ? userVipInfo.firmMonthExp : userVipInfo.monthExp'></span>
+						</div>
+					</div>
+					<div class="vip_main_growValue vip_grow_all" :class="{'active':userVipInfo.vip >0}" v-show="userVipInfo.monthExp">
+						<div class="vip_growValue_top">
+							<span class="vip_growValue_tit" ></span><span class="vip_activation" v-text="userVipInfo.vip > 0 ? '已激活' : '未激活'"></span> <span class="vip_growValue_desc" v-text="'累积成长值为'+userVipInfo.firmExp+'点，还差'+userVipInfo.upExp+'点到下一等级'" ></span>
+						</div>
+						<div class="vip_prowValue_grade_box clearfloat">
+							<div class="float_left" v-for = "(item,index) in vipGradeList">
+								<dl :class="['grade'+(index+1),{'active':userVipInfo.vipGrade >= (index+1)}]" >
+									<dt></dt><dd v-text="'成长值满'+item.start+'点'"></dd>
+								</dl>
+								<div class="line_box" :class="[{'active':userVipInfo.vipGrade >= (index+1)},{'active1':userVipInfo.vipGrade >= (index+2)}]"></div>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="vip_main_center" v-show="userVipInfo.monthExp">
+					<div class="vip_main_icon cont cont4">
+						<div class="vip_main_icon_tit cont_tit" :class="{'noactive':isActive}">VIP特权</div>
+						<div class="vip_main_icon_boxs clearfloat">
+							<dl class="float_left" v-for="(item,index) in vipPrivilege" @click="goToNext(item)">
+								<dt><img :src="item.state == 1 ? item.onLogo : item.offLogo"/></dt>
+								<dd v-text="item.name"></dd>
+							</dl>
+						</div>
+					</div>
+				</div>
+				<div class="vip_main_bottom" v-show="userVipInfo.monthExp">
+					<div class="vip_main_introduce">
+						<div class="vip_main_introduce_item">
+							<div class="vip_main_introduce_title">
+								1.VIP享受条件
+							</div>
+							<div class="vip_main_introduce_content">
+								<p>当月成长值达到<span v-text="system.month_exp"></span>点，享受下月相应等级VIP会员服务，<b>有效期一个月</b></p>
+							</div>
+						</div>
+						<div class="vip_main_introduce_item">
+							<div class="vip_main_introduce_title">
+								2.VIP会员成长值
+							</div>
+							<div class="vip_main_introduce_content">
+								<p>VIP成长值是基于用户一定时期内使用果速送平台的下单实付金额、下单频次以及合作情况决定；用户达到相应的成长值享受VIP服务以及提升VIP等级</p>
+								<p class="formula">当月成长值=实付金额成长值+下单频次成长值+不良记录下降值</p>
+								<div class="table">
+									<div class="table_tr clearfloat">
+										<div class="table_td">实付金额成长值</div>
+										<div class="table_td">实付金额<span v-text="system.exp_of_pay_money"></span>元=1点</div>
+									</div>
+									<div class="table_tr clearfloat">
+										<div class="table_td">下单频次成长值（每日）</div>
+										<div class="table_td">下单=<span v-text="system.order_add_exp"></span>点/次，未下单= -<span v-text="system.order_ueduce_exp"></span>点/次</div>
+									</div>
+									<div class="table_tr clearfloat">
+										<div class="table_td">不良记录下降值</div>
+										<div class="table_td">逾期付款（隔夜）= -<span v-text="system.two_night_not_pay"></span>点/天</div>
+									</div>
+								</div>
+								<p class="notes">注：一个月三次以上逾期付款(隔夜)或无理由退货，取消其下月VIP资格</p>
+							</div>
+						</div>
+						<div class="vip_main_introduce_item">
+							<div class="vip_main_introduce_title">
+								3.VIP等级
+							</div>
+							<div class="vip_main_introduce_content">
+								<p>VIP等级是所有月份累积的成长值，达到相应标准即可升级；一旦升级，<b>一年内有效；</b>如果一年内没有升级，次年将降一级（保留等级最低值）</p>
+								<div class="table">
+									<div class="table_tr clearfloat">
+										<div class="table_td">等级</div>
+										<div class="table_td">相应累积成长值</div>
+									</div>
+									<div class="table_tr clearfloat" v-for="(item,index) in vipGradeList">
+										<div class="table_td" v-text="item.name"></div>
+										<div class="table_td" v-text="item.start+'点'"></div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		
+	</body>
+	<!-- build:js js/min/address.min.js -->
+	<script src="../quote/jquery-1.8.3.min.js" type="text/javascript" charset="utf-8"></script>
+	<script src="../quote/vue.min.js" type="text/javascript" charset="utf-8"></script>
+	<script src="../quote/mobile-util.js" type="text/javascript" charset="utf-8"></script>
+	<script src="../quote/mdData.js" type="text/javascript" charset="utf-8"></script>
+	<script src="../quote/layer.js" type="text/javascript" charset="utf-8"></script>
+	<script src="../js/common-9c404c10bb.js?v=20180929" type="text/javascript" charset="utf-8"></script>
+	<script src="../js/vip-b77add396f.js?v=20180930" type="text/javascript" charset="utf-8"></script>
+	<!-- endbuild -->
+</html>

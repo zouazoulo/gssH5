@@ -55,13 +55,52 @@ $(document).ready(function(){
 			var html='';
 			for (var i in v) {
 				html +='<dl class="clearfloat" data="'+v[i].id+'">'
-				html +='<dt><img src="'+v[i].goodsLogo+'"/></dt>'
+				html +='	<dt>'
+				html +='		<img src="'+v[i].goodsLogo+'"/>'
+				if (v[i].vipGrade > 0) {
+	            	html += '	<span class = "icon_vip'+v[i].vipGrade+'"></span>'
+	            }
+				html +='	</dt>'
 				html +='<dd>'
 				html +='<h3 class="moreGoods_goods_name ellipsis">'+v[i].goodsName+'</h3>'
+				/*if (v[i].vipGrade > 0) {
+					if (v[i].maxCount) {
+						html +='<p class="moreGoods_goods_text">限购'+v[i].maxCount+'件</p>'
+					}else{
+						html +='<p class="moreGoods_goods_text"> </p>'
+					}
+	            }else{
+	            	html +='<p class="moreGoods_goods_text">'+v[i].goodsShows+'</p>'
+	            }*/
 				html +='<p class="moreGoods_goods_text">'+v[i].goodsShows+'</p>'
 				html +='<p class="moreGoods_goods_price">'
-				html +='	<span class="fontColor">'+v[i].gssPrice+'</span>元/'+v[i].priceUnit+' &nbsp; &nbsp;<span>'+v[i].priceDesc+'</span>'
+				if (common.getIslogin()) {
+					if (v[i].vipGrade > 0) {
+						html +='<span class="fontColor">'+v[i].wholeGssPrice+'</span>元/'+v[i].wholePriceSize+' &nbsp; &nbsp;<del>'+v[i].nomalPrice+'元/'+v[i].wholePriceSize+'</del>'
+		            }else{
+		            	html +='<span class="fontColor">'+v[i].gssPrice+'</span>元/'+v[i].priceUnit+' &nbsp; &nbsp;<span>'+v[i].priceDesc+'</span>'
+		            }
+				}else{
+					
+				}
 				html +='</p>'
+				/*if(v[i].vipGrade > 0){
+				}else{
+					html +='<div class="moreGoods_goods_icon">'
+					if (v[i].isSale) {
+						html +=' <span class = "icon_cu"></span>'
+					}
+					if (v[i].isNew) {
+						html +=' <span class = "icon_ji"></span>'
+					}
+					if (v[i].isRecommend) {
+						html +=' <span class = "icon_jian"></span>'
+					}
+					if (v[i].isHot) {
+						html +=' <span class = "icon_re"></span>'
+					}
+					html +='</div>'
+				}*/
 				html +='<div class="moreGoods_goods_icon">'
 				if (v[i].isSale) {
 					html +=' <span class = "icon_cu"></span>'
@@ -80,9 +119,9 @@ $(document).ready(function(){
 				html +='</dl>'
 			}
 			$(".search_goods").append(html);
-			if (!common.getIslogin()) {
+			/*if (!common.getIslogin()) {
 				$('.moreGoods_goods_price').html('<span class="fontColor">15</span>单');
-			}
+			}*/
 			var goods=$(".search_goods dl");
 			common.txq(goods,4)
 		}
